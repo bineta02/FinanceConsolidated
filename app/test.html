@@ -1,0 +1,1372 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GreenCapital | Financement Alternatif & Inclusif</title>
+
+  <!-- Bootstrap 5.3 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
+  <!-- AOS Animation -->
+  <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+
+  <style>
+    /* ========================
+       DESIGN TOKENS
+    ======================== */
+    :root {
+      --green-900: #052e1a;
+      --green-800: #0a4a2c;
+      --green-700: #0e6b3e;
+      --green-600: #178a51;
+      --green-400: #4bb87a;
+      --green-200: #b8e8cc;
+      --green-100: #e3f5eb;
+      --green-50:  #f3fbf6;
+      --gold:      #d4a853;
+      --gold-lt:   #f5e6c1;
+      --white:     #ffffff;
+      --ink:       #131f17;
+      --ink-muted: #4a5e52;
+      --radius-card: 20px;
+      --radius-pill: 100px;
+      --shadow-soft: 0 4px 24px rgba(5,46,26,.08);
+      --shadow-card: 0 8px 32px rgba(5,46,26,.10);
+      --shadow-float: 0 20px 48px rgba(5,46,26,.16);
+      --font-display: 'Playfair Display', Georgia, serif;
+      --font-body: 'DM Sans', system-ui, sans-serif;
+    }
+
+    /* ========================
+       BASE
+    ======================== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-body);
+      background: var(--white);
+      color: var(--ink);
+      overflow-x: hidden;
+    }
+    ::selection { background: var(--green-200); color: var(--green-900); }
+
+    /* ========================
+       NAVBAR
+    ======================== */
+    .gc-nav {
+      background: rgba(255,255,255,.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(14,107,62,.08);
+      padding: .9rem 0;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      transition: box-shadow .3s;
+    }
+    .gc-nav.scrolled { box-shadow: 0 4px 20px rgba(5,46,26,.10); }
+
+    .gc-brand {
+      font-family: var(--font-display);
+      font-size: 1.55rem;
+      font-weight: 700;
+      color: var(--green-700) !important;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: .45rem;
+      letter-spacing: -.01em;
+    }
+    .gc-brand .leaf-icon {
+      width: 34px; height: 34px;
+      background: linear-gradient(135deg, var(--green-400), var(--green-700));
+      border-radius: 10px 2px 10px 2px;
+      display: inline-flex; align-items: center; justify-content: center;
+      color: white;
+      font-size: .95rem;
+      flex-shrink: 0;
+    }
+
+    .btn-gc-outline {
+      border: 1.5px solid var(--green-700);
+      color: var(--green-700);
+      background: transparent;
+      border-radius: var(--radius-pill);
+      padding: .45rem 1.5rem;
+      font-family: var(--font-body);
+      font-weight: 600;
+      font-size: .88rem;
+      letter-spacing: .02em;
+      transition: all .22s ease;
+      text-decoration: none;
+      display: inline-flex; align-items: center; gap: .4rem;
+    }
+    .btn-gc-outline:hover {
+      background: var(--green-700);
+      color: white;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(14,107,62,.25);
+    }
+    .btn-gc {
+      background: linear-gradient(135deg, var(--green-600), var(--green-800));
+      border: none;
+      color: white;
+      border-radius: var(--radius-pill);
+      padding: .5rem 1.6rem;
+      font-family: var(--font-body);
+      font-weight: 600;
+      font-size: .88rem;
+      letter-spacing: .02em;
+      transition: all .22s ease;
+      text-decoration: none;
+      display: inline-flex; align-items: center; gap: .4rem;
+      cursor: pointer;
+    }
+    .btn-gc:hover {
+      background: linear-gradient(135deg, var(--green-700), var(--green-900));
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(14,107,62,.30);
+    }
+
+    /* ========================
+       HERO
+    ======================== */
+    .hero {
+      background: linear-gradient(160deg, var(--white) 0%, var(--green-50) 55%, var(--green-100) 100%);
+      padding: 5.5rem 0 4.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -120px; right: -120px;
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(75,184,122,.12) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    .hero::after {
+      content: '';
+      position: absolute;
+      bottom: -80px; left: -80px;
+      width: 360px; height: 360px;
+      background: radial-gradient(circle, rgba(14,107,62,.07) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: .5rem;
+      background: var(--gold-lt);
+      color: #7a5a10;
+      border: 1px solid rgba(212,168,83,.3);
+      border-radius: var(--radius-pill);
+      padding: .35rem 1rem;
+      font-size: .8rem;
+      font-weight: 600;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      margin-bottom: 1.4rem;
+    }
+
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(2.2rem, 5vw, 3.4rem);
+      font-weight: 800;
+      line-height: 1.13;
+      color: var(--ink);
+      margin-bottom: 1.3rem;
+    }
+    .hero-title .accent { color: var(--green-700); position: relative; }
+    .hero-title .accent::after {
+      content: '';
+      position: absolute;
+      bottom: 2px; left: 0;
+      width: 100%; height: 6px;
+      background: linear-gradient(90deg, var(--green-400), transparent);
+      border-radius: 3px;
+      opacity: .4;
+    }
+
+    .hero-sub {
+      font-size: 1.05rem;
+      color: var(--ink-muted);
+      line-height: 1.7;
+      max-width: 480px;
+      margin-bottom: 2.2rem;
+    }
+
+    .hero-actions { display: flex; gap: .8rem; flex-wrap: wrap; }
+
+    .hero-visual {
+      position: relative;
+    }
+    .hero-frame {
+      background: white;
+      border-radius: 24px;
+      padding: 1.5rem;
+      box-shadow: var(--shadow-float);
+      position: relative;
+    }
+    .hero-frame img { border-radius: 14px; width: 100%; display: block; }
+
+    /* Floating stat chips */
+    .stat-chip {
+      position: absolute;
+      background: white;
+      border-radius: 14px;
+      box-shadow: var(--shadow-card);
+      padding: .7rem 1.1rem;
+      display: flex; align-items: center; gap: .6rem;
+      font-size: .82rem;
+      font-weight: 600;
+      color: var(--ink);
+      white-space: nowrap;
+    }
+    .stat-chip .chip-icon {
+      width: 32px; height: 32px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .9rem;
+      flex-shrink: 0;
+    }
+    .stat-chip-1 { top: -18px; left: -20px; animation: floatA 4s ease-in-out infinite; }
+    .stat-chip-2 { bottom: -16px; right: -16px; animation: floatB 4.5s ease-in-out infinite; }
+
+    @keyframes floatA {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+    @keyframes floatB {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(6px); }
+    }
+
+    /* ========================
+       SECTION COMMONS
+    ======================== */
+    .section-label {
+      font-size: .75rem;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--green-600);
+      margin-bottom: .6rem;
+    }
+    .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(1.7rem, 3.5vw, 2.3rem);
+      font-weight: 700;
+      color: var(--ink);
+      line-height: 1.2;
+    }
+    .section-sub {
+      color: var(--ink-muted);
+      font-size: .97rem;
+      line-height: 1.7;
+      max-width: 520px;
+    }
+
+    /* ========================
+       ACTEURS
+    ======================== */
+    .actors-section { background: var(--green-50); padding: 5rem 0; }
+
+    .actor-card {
+      background: white;
+      border-radius: var(--radius-card);
+      padding: 2.2rem 2rem;
+      box-shadow: var(--shadow-soft);
+      transition: all .28s cubic-bezier(.34,1.56,.64,1);
+      border: 1px solid rgba(14,107,62,.06);
+      height: 100%;
+      display: flex; flex-direction: column;
+      align-items: flex-start;
+    }
+    .actor-card:hover {
+      transform: translateY(-10px);
+      box-shadow: var(--shadow-float);
+      border-color: rgba(14,107,62,.15);
+    }
+
+    .actor-icon {
+      width: 58px; height: 58px;
+      border-radius: 16px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem;
+      margin-bottom: 1.3rem;
+    }
+    .actor-icon-green  { background: var(--green-100); color: var(--green-700); }
+    .actor-icon-gold   { background: var(--gold-lt);   color: #8a6020; }
+    .actor-icon-dark   { background: var(--green-900); color: var(--green-400); }
+
+    .actor-card h4 {
+      font-family: var(--font-display);
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: .6rem;
+    }
+    .actor-card p {
+      color: var(--ink-muted);
+      font-size: .9rem;
+      line-height: 1.65;
+      flex: 1;
+      margin-bottom: 1.4rem;
+    }
+
+    .btn-actor {
+      border: 1.5px solid var(--green-700);
+      color: var(--green-700);
+      background: transparent;
+      border-radius: var(--radius-pill);
+      padding: .4rem 1.2rem;
+      font-size: .83rem;
+      font-weight: 600;
+      letter-spacing: .02em;
+      transition: all .2s;
+      cursor: pointer;
+    }
+    .btn-actor:hover {
+      background: var(--green-700);
+      color: white;
+    }
+
+    /* ========================
+       FEATURES
+    ======================== */
+    .features-section { padding: 5rem 0; background: white; }
+
+    .feature-item {
+      display: flex; gap: 1.2rem; align-items: flex-start;
+      padding: 1.4rem;
+      border-radius: 14px;
+      transition: background .2s;
+    }
+    .feature-item:hover { background: var(--green-50); }
+
+    .feature-icon {
+      width: 48px; height: 48px; flex-shrink: 0;
+      background: var(--green-100);
+      color: var(--green-700);
+      border-radius: 13px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.25rem;
+    }
+    .feature-item h5 {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: .3rem;
+    }
+    .feature-item p { color: var(--ink-muted); font-size: .87rem; line-height: 1.6; margin: 0; }
+
+    /* ========================
+       STATS BANNER
+    ======================== */
+    .stats-banner {
+      background: linear-gradient(135deg, var(--green-800) 0%, var(--green-900) 100%);
+      padding: 3.5rem 0;
+      position: relative;
+      overflow: hidden;
+    }
+    .stats-banner::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Ccircle cx='30' cy='30' r='20'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+
+    .stat-item { text-align: center; color: white; }
+    .stat-num {
+      font-family: var(--font-display);
+      font-size: 2.6rem;
+      font-weight: 800;
+      color: white;
+      display: block;
+      line-height: 1;
+      margin-bottom: .3rem;
+    }
+    .stat-num .unit { color: var(--green-400); }
+    .stat-label { font-size: .83rem; color: rgba(255,255,255,.65); font-weight: 500; letter-spacing: .03em; }
+    .stat-divider {
+      width: 1px; background: rgba(255,255,255,.12);
+      align-self: stretch;
+    }
+
+    /* ========================
+       HOW IT WORKS
+    ======================== */
+    .how-section { padding: 5rem 0; background: var(--green-50); }
+
+    .step-card {
+      background: white;
+      border-radius: var(--radius-card);
+      padding: 1.8rem 1.6rem;
+      box-shadow: var(--shadow-soft);
+      position: relative;
+      border: 1px solid rgba(14,107,62,.06);
+    }
+    .step-num {
+      font-family: var(--font-display);
+      font-size: 3.5rem;
+      font-weight: 800;
+      color: var(--green-100);
+      line-height: 1;
+      position: absolute;
+      top: 1rem; right: 1.2rem;
+    }
+    .step-card h5 {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1rem;
+      margin-bottom: .4rem;
+    }
+    .step-card p { color: var(--ink-muted); font-size: .87rem; line-height: 1.6; margin: 0; }
+    .step-dot {
+      width: 38px; height: 38px;
+      background: var(--green-700);
+      color: white;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700;
+      font-size: .9rem;
+      margin-bottom: 1.1rem;
+      flex-shrink: 0;
+    }
+
+    /* ========================
+       TESTIMONIALS
+    ======================== */
+    .testi-section { padding: 5rem 0; background: white; }
+
+    .testi-card {
+      background: var(--green-50);
+      border-radius: var(--radius-card);
+      padding: 2rem;
+      border: 1px solid rgba(14,107,62,.08);
+      height: 100%;
+    }
+    .testi-stars { color: var(--gold); font-size: .9rem; margin-bottom: .8rem; }
+    .testi-text {
+      color: var(--ink);
+      font-size: .93rem;
+      line-height: 1.7;
+      font-style: italic;
+      margin-bottom: 1.3rem;
+    }
+    .testi-author { display: flex; align-items: center; gap: .8rem; }
+    .testi-avatar {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--green-400), var(--green-700));
+      color: white;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700;
+      font-size: .9rem;
+      flex-shrink: 0;
+    }
+    .testi-name { font-weight: 700; font-size: .9rem; }
+    .testi-role { color: var(--ink-muted); font-size: .78rem; }
+
+    /* ========================
+       CTA STRIP
+    ======================== */
+    .cta-section {
+      background: linear-gradient(135deg, var(--green-700), var(--green-900));
+      padding: 4.5rem 0;
+      text-align: center;
+    }
+    .cta-section h2 {
+      font-family: var(--font-display);
+      font-size: clamp(1.8rem, 4vw, 2.6rem);
+      font-weight: 800;
+      color: white;
+      margin-bottom: 1rem;
+    }
+    .cta-section p { color: rgba(255,255,255,.75); font-size: 1rem; margin-bottom: 2rem; }
+    .btn-gc-white {
+      background: white;
+      color: var(--green-800);
+      border: none;
+      border-radius: var(--radius-pill);
+      padding: .75rem 2.2rem;
+      font-family: var(--font-body);
+      font-weight: 700;
+      font-size: .95rem;
+      transition: all .22s;
+      display: inline-flex; align-items: center; gap: .5rem;
+      cursor: pointer;
+    }
+    .btn-gc-white:hover { transform: translateY(-3px); box-shadow: 0 12px 28px rgba(0,0,0,.25); }
+
+    /* ========================
+       FOOTER
+    ======================== */
+    footer {
+      background: var(--green-900);
+      color: rgba(255,255,255,.6);
+      padding: 3rem 0 1.8rem;
+    }
+    .footer-brand {
+      font-family: var(--font-display);
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: white;
+      margin-bottom: .5rem;
+    }
+    .footer-desc { font-size: .85rem; line-height: 1.7; max-width: 280px; margin-bottom: 1.2rem; }
+    .footer-links h6 {
+      color: rgba(255,255,255,.9);
+      font-weight: 600;
+      font-size: .8rem;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      margin-bottom: .8rem;
+    }
+    .footer-links ul { list-style: none; padding: 0; }
+    .footer-links li { margin-bottom: .4rem; }
+    .footer-links a { color: rgba(255,255,255,.55); font-size: .84rem; text-decoration: none; transition: color .2s; }
+    .footer-links a:hover { color: var(--green-400); }
+    .footer-bottom {
+      border-top: 1px solid rgba(255,255,255,.08);
+      margin-top: 2.5rem;
+      padding-top: 1.3rem;
+      display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: .5rem;
+      font-size: .78rem;
+    }
+    .footer-socials a {
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.08);
+      color: rgba(255,255,255,.6);
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: .85rem;
+      margin-left: .4rem;
+      text-decoration: none;
+      transition: all .2s;
+    }
+    .footer-socials a:hover { background: var(--green-700); color: white; }
+
+    /* ========================
+       MODAL AUTH
+    ======================== */
+    .modal-content {
+      border: none;
+      border-radius: 26px;
+      overflow: hidden;
+      box-shadow: 0 30px 60px rgba(5,46,26,.25);
+    }
+    .modal-body { padding: 2.4rem; }
+
+    .auth-tabs {
+      display: flex;
+      border-bottom: 2px solid var(--green-100);
+      margin-bottom: 1.8rem;
+    }
+    .auth-tab {
+      flex: 1; text-align: center;
+      padding: .7rem;
+      font-weight: 600;
+      font-size: .95rem;
+      color: var(--ink-muted);
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px;
+      transition: all .2s;
+    }
+    .auth-tab.active {
+      color: var(--green-700);
+      border-bottom-color: var(--green-700);
+    }
+
+    .form-control-gc {
+      border: 1.5px solid rgba(14,107,62,.15);
+      border-radius: 12px;
+      padding: .65rem 1rem;
+      font-family: var(--font-body);
+      font-size: .9rem;
+      transition: border .2s, box-shadow .2s;
+      width: 100%;
+    }
+    .form-control-gc:focus {
+      outline: none;
+      border-color: var(--green-600);
+      box-shadow: 0 0 0 3px rgba(14,107,62,.10);
+    }
+    .form-label-gc {
+      font-size: .82rem;
+      font-weight: 600;
+      color: var(--ink-muted);
+      margin-bottom: .35rem;
+      display: block;
+    }
+    .form-group-gc { margin-bottom: 1rem; }
+    .input-icon-wrap { position: relative; }
+    .input-icon-wrap .input-icon {
+      position: absolute; top: 50%; left: .85rem; transform: translateY(-50%);
+      color: var(--ink-muted); font-size: .85rem; pointer-events: none;
+    }
+    .input-icon-wrap .form-control-gc { padding-left: 2.4rem; }
+
+    .modal-demo-hint {
+      background: var(--green-50);
+      border: 1px solid var(--green-200);
+      border-radius: 10px;
+      padding: .7rem 1rem;
+      font-size: .78rem;
+      color: var(--green-800);
+      margin-top: 1.2rem;
+    }
+    .modal-demo-hint strong { display: block; margin-bottom: .3rem; }
+
+    /* ========================
+       TOAST
+    ======================== */
+    .toast-container { position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 9999; }
+    .gc-toast {
+      background: white;
+      border-radius: 14px;
+      box-shadow: 0 8px 24px rgba(0,0,0,.16);
+      border: none;
+      min-width: 280px;
+      overflow: hidden;
+    }
+    .gc-toast .toast-header {
+      border-bottom: none;
+      padding: .7rem 1rem .4rem;
+      font-weight: 700;
+      font-size: .88rem;
+    }
+    .gc-toast .toast-body { padding: .4rem 1rem .8rem; font-size: .87rem; color: var(--ink-muted); }
+    .toast-header-success { color: var(--green-700); }
+    .toast-header-danger  { color: #c0392b; }
+    .toast-header-warning { color: #b07d10; }
+
+    /* ========================
+       RESPONSIVE TWEAKS
+    ======================== */
+    @media (max-width: 767px) {
+      .hero { padding: 3.5rem 0 3rem; }
+      .hero-frame { margin-top: 2rem; }
+      .stat-chip { display: none; }
+      .hero-actions { flex-direction: column; gap: .6rem; }
+      .hero-actions .btn-gc,
+      .hero-actions .btn-gc-outline { width: 100%; justify-content: center; }
+      .stats-banner .row { gap: 1.5rem; }
+      .stat-divider { display: none; }
+      .footer-brand-col { margin-bottom: 1.5rem; }
+    }
+
+    /* ========================
+       UTILITIES / MISC
+    ======================== */
+    .divider-dot { color: var(--green-400); margin: 0 .5rem; }
+    .cursor-pointer { cursor: pointer; }
+
+    /* Scroll reveal helper */
+    [data-aos] { will-change: transform, opacity; }
+  </style>
+</head>
+<body>
+
+<!-- ===========================
+     NAVBAR
+=========================== -->
+<nav class="gc-nav" id="mainNav">
+  <div class="container d-flex align-items-center justify-content-between">
+    <a href="#" class="gc-brand">
+      <span class="leaf-icon"><i class="fas fa-leaf"></i></span>
+      GreenCapital
+    </a>
+    <div class="d-flex align-items-center gap-2">
+      <button class="btn-gc-outline d-none d-sm-inline-flex" id="showLoginBtn">
+        <i class="fas fa-sign-in-alt"></i> Connexion
+      </button>
+      <button class="btn-gc" id="showRegisterBtn">
+        <i class="fas fa-user-plus"></i> <span class="d-none d-sm-inline">Inscription</span><span class="d-sm-none">S'inscrire</span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- ===========================
+     HERO
+=========================== -->
+<section class="hero">
+  <div class="container">
+    <div class="row align-items-center gy-5">
+      <!-- Left -->
+      <div class="col-lg-6" data-aos="fade-right" data-aos-duration="700">
+        <div class="hero-badge">
+          <i class="fas fa-seedling"></i>
+          Financement alternatif & inclusif
+        </div>
+        <h1 class="hero-title">
+          Libérez le capital <span class="accent">vert</span><br>pour les entrepreneurs de demain
+        </h1>
+        <p class="hero-sub">
+          GreenCapital connecte bailleurs, retraités et porteurs de projets innovants. Évaluation IA, contrats intelligents et suivi en temps réel — tout en un.
+        </p>
+        <div class="hero-actions">
+          <button class="btn-gc px-4 py-2" id="heroRegisterBtn" style="font-size:.95rem;">
+            <i class="fas fa-user-plus"></i> Rejoindre la plateforme
+          </button>
+          <button class="btn-gc-outline px-4 py-2" id="heroLoginBtn" style="font-size:.95rem;">
+            <i class="fas fa-play-circle"></i> Voir la démo
+          </button>
+        </div>
+        <!-- Trust bar -->
+        <div class="mt-4 d-flex align-items-center gap-2 flex-wrap" style="font-size:.8rem; color:var(--ink-muted);">
+          <i class="fas fa-shield-alt" style="color:var(--green-600);"></i>
+          <span>Plateforme sécurisée</span>
+          <span class="divider-dot">•</span>
+          <i class="fas fa-file-contract" style="color:var(--green-600);"></i>
+          <span>Contrats certifiés</span>
+          <span class="divider-dot">•</span>
+          <i class="fas fa-brain" style="color:var(--green-600);"></i>
+          <span>Évaluation IA</span>
+        </div>
+      </div>
+      <!-- Right: visual -->
+      <div class="col-lg-6" data-aos="fade-left" data-aos-duration="700" data-aos-delay="100">
+        <div class="hero-visual">
+          <div class="hero-frame">
+            <img src="https://placehold.co/600x400/e3f5eb/0e6b3e?text=Dashboard+GreenCapital&font=playfair-display" alt="GreenCapital Dashboard">
+          </div>
+          <!-- Floating chips -->
+          <div class="stat-chip stat-chip-1">
+            <div class="chip-icon" style="background:var(--green-100); color:var(--green-700);">
+              <i class="fas fa-chart-line"></i>
+            </div>
+            <div>
+              <div style="font-size:.7rem; color:var(--ink-muted); font-weight:500;">Rendement moyen</div>
+              <div style="color:var(--green-700); font-size:.95rem;">+12.4 %</div>
+            </div>
+          </div>
+          <div class="stat-chip stat-chip-2">
+            <div class="chip-icon" style="background:var(--gold-lt); color:#8a6020;">
+              <i class="fas fa-handshake"></i>
+            </div>
+            <div>
+              <div style="font-size:.7rem; color:var(--ink-muted); font-weight:500;">Projets financés</div>
+              <div style="color:#8a6020; font-size:.95rem;">148 projets</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===========================
+     STATS BANNER
+=========================== -->
+<section class="stats-banner">
+  <div class="container">
+    <div class="row justify-content-center align-items-stretch g-4">
+      <div class="col-6 col-md-3 stat-item" data-aos="fade-up" data-aos-delay="0">
+        <span class="stat-num"><span class="counter" data-target="148">0</span><span class="unit">+</span></span>
+        <span class="stat-label">Projets financés</span>
+      </div>
+      <div class="col-1 stat-divider d-none d-md-block"></div>
+      <div class="col-6 col-md-3 stat-item" data-aos="fade-up" data-aos-delay="80">
+        <span class="stat-num"><span class="counter" data-target="320">0</span><span class="unit">M</span></span>
+        <span class="stat-label">FCFA mobilisés</span>
+      </div>
+      <div class="col-1 stat-divider d-none d-md-block"></div>
+      <div class="col-6 col-md-3 stat-item" data-aos="fade-up" data-aos-delay="160">
+        <span class="stat-num"><span class="counter" data-target="94">0</span><span class="unit">%</span></span>
+        <span class="stat-label">Taux de remboursement</span>
+      </div>
+      <div class="col-1 stat-divider d-none d-md-block"></div>
+      <div class="col-6 col-md-3 stat-item" data-aos="fade-up" data-aos-delay="240">
+        <span class="stat-num"><span class="counter" data-target="860">0</span><span class="unit">+</span></span>
+        <span class="stat-label">Membres actifs</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===========================
+     ACTEURS
+=========================== -->
+<section class="actors-section">
+  <div class="container">
+    <div class="text-center mb-5" data-aos="fade-up">
+      <p class="section-label">Trois profils</p>
+      <h2 class="section-title mb-2">Trois acteurs, une mission commune</h2>
+      <p class="section-sub mx-auto">Des espaces personnalisés pour chaque profil, conçus pour maximiser l'impact et la transparence.</p>
+    </div>
+    <div class="row g-4">
+      <!-- Bailleur -->
+      <div class="col-md-4" data-aos="fade-up" data-aos-delay="0">
+        <div class="actor-card">
+          <div class="actor-icon actor-icon-green">
+            <i class="fas fa-chart-line"></i>
+          </div>
+          <h4>Bailleur / Retraité</h4>
+          <p>Définissez vos critères d'investissement, choisissez des projets porteurs, suivez vos rendements et échéances en temps réel.</p>
+          <button class="btn-actor choose-actor-btn" data-actor="bailleur">
+            Je suis bailleur <i class="fas fa-arrow-right ms-1"></i>
+          </button>
+        </div>
+      </div>
+      <!-- Entrepreneur -->
+      <div class="col-md-4" data-aos="fade-up" data-aos-delay="80">
+        <div class="actor-card" style="border-top: 3px solid var(--green-700);">
+          <div class="actor-icon actor-icon-gold">
+            <i class="fas fa-rocket"></i>
+          </div>
+          <h4>Jeune Entrepreneur</h4>
+          <p>Déposez votre projet, recevez des financements adaptés, gérez vos remboursements et communiquez avec vos investisseurs.</p>
+          <button class="btn-actor choose-actor-btn" data-actor="entrepreneur">
+            Je suis entrepreneur <i class="fas fa-arrow-right ms-1"></i>
+          </button>
+        </div>
+      </div>
+      <!-- Admin -->
+      <div class="col-md-4" data-aos="fade-up" data-aos-delay="160">
+        <div class="actor-card">
+          <div class="actor-icon actor-icon-dark">
+            <i class="fas fa-shield-alt"></i>
+          </div>
+          <h4>Administrateur</h4>
+          <p>Supervision globale, validation des projets, gestion des utilisateurs, tableaux de bord analytiques et rapports.</p>
+          <button class="btn-actor choose-actor-btn" data-actor="admin">
+            Accès admin <i class="fas fa-arrow-right ms-1"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===========================
+     FEATURES
+=========================== -->
+<section class="features-section">
+  <div class="container">
+    <div class="row align-items-center gy-5">
+      <div class="col-lg-5" data-aos="fade-right">
+        <p class="section-label">Pourquoi GreenCapital ?</p>
+        <h2 class="section-title mb-3">Une plateforme pensée pour l'impact</h2>
+        <p class="section-sub mb-4">De l'évaluation à la clôture, chaque étape est sécurisée, transparente et assistée par l'intelligence artificielle.</p>
+        <button class="btn-gc" id="featLearnMoreBtn" style="font-size:.9rem; padding:.6rem 1.8rem;">
+          Découvrir toutes les fonctionnalités <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+      <div class="col-lg-7" data-aos="fade-left">
+        <div class="row g-2">
+          <div class="col-12">
+            <div class="feature-item">
+              <div class="feature-icon"><i class="fas fa-building"></i></div>
+              <div>
+                <h5>Espace Bailleur complet</h5>
+                <p>Définissez vos critères d'investissement : montant max, garanties requises, secteurs ciblés, bénéfices attendus. Interface claire et intuitive.</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-12">
+            <div class="feature-item">
+              <div class="feature-icon"><i class="fas fa-gavel"></i></div>
+              <div>
+                <h5>Module Juridique Intégré</h5>
+                <p>Contrats intelligents générés automatiquement, engagements formels, archivage horodaté des preuves et signatures électroniques.</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-12">
+            <div class="feature-item">
+              <div class="feature-icon"><i class="fas fa-calendar-check"></i></div>
+              <div>
+                <h5>Suivi de remboursement en temps réel</h5>
+                <p>Échéanciers personnalisés, alertes automatiques, suivi des paiements transparent pour toutes les parties prenantes.</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-12">
+            <div class="feature-item">
+              <div class="feature-icon"><i class="fas fa-brain"></i></div>
+              <div>
+                <h5>Évaluation IA des projets</h5>
+                <p>Scoring automatique, analyse de viabilité, recommandations personnalisées basées sur des données sectorielles et des modèles prédictifs.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===========================
+     HOW IT WORKS
+=========================== -->
+<section class="how-section">
+  <div class="container">
+    <div class="text-center mb-5" data-aos="fade-up">
+      <p class="section-label">Comment ça marche</p>
+      <h2 class="section-title mb-2">Simple, rapide, sécurisé</h2>
+      <p class="section-sub mx-auto">Rejoignez GreenCapital en 4 étapes et commencez à créer de la valeur dès aujourd'hui.</p>
+    </div>
+    <div class="row g-4">
+      <div class="col-sm-6 col-lg-3" data-aos="fade-up" data-aos-delay="0">
+        <div class="step-card">
+          <div class="step-num">01</div>
+          <div class="step-dot">1</div>
+          <h5>Créez votre compte</h5>
+          <p>Inscription en 2 minutes. Choisissez votre profil : bailleur ou entrepreneur.</p>
+        </div>
+      </div>
+      <div class="col-sm-6 col-lg-3" data-aos="fade-up" data-aos-delay="80">
+        <div class="step-card">
+          <div class="step-num">02</div>
+          <div class="step-dot" style="background:var(--green-600);">2</div>
+          <h5>Déposez ou explorez</h5>
+          <p>Publiez votre projet ou parcourez les opportunités d'investissement disponibles.</p>
+        </div>
+      </div>
+      <div class="col-sm-6 col-lg-3" data-aos="fade-up" data-aos-delay="160">
+        <div class="step-card">
+          <div class="step-num">03</div>
+          <div class="step-dot" style="background:var(--green-500);">3</div>
+          <h5>Validez & Signez</h5>
+          <p>L'IA évalue, les équipes valident, les contrats sont générés et signés électroniquement.</p>
+        </div>
+      </div>
+      <div class="col-sm-6 col-lg-3" data-aos="fade-up" data-aos-delay="240">
+        <div class="step-card">
+          <div class="step-num">04</div>
+          <div class="step-dot" style="background:var(--gold);">4</div>
+          <h5>Suivez & Récoltez</h5>
+          <p>Tableau de bord en temps réel, alertes, rapports et paiements sécurisés à chaque échéance.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===========================
+     TESTIMONIALS
+=========================== -->
+<section class="testi-section">
+  <div class="container">
+    <div class="text-center mb-5" data-aos="fade-up">
+      <p class="section-label">Témoignages</p>
+      <h2 class="section-title">Ce qu'ils disent de GreenCapital</h2>
+    </div>
+    <div class="row g-4">
+      <div class="col-md-4" data-aos="fade-up" data-aos-delay="0">
+        <div class="testi-card">
+          <div class="testi-stars">
+            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+          </div>
+          <p class="testi-text">« Grâce à GreenCapital, j'ai pu financer mon projet agricole en moins de 3 semaines. Le processus est transparent et les contrats clairs. »</p>
+          <div class="testi-author">
+            <div class="testi-avatar">MD</div>
+            <div>
+              <div class="testi-name">Mamadou Diallo</div>
+              <div class="testi-role">Entrepreneur, Thiès</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4" data-aos="fade-up" data-aos-delay="80">
+        <div class="testi-card">
+          <div class="testi-stars">
+            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+          </div>
+          <p class="testi-text">« À la retraite, je cherchais une façon d'utiliser mes économies utilement. GreenCapital m'a permis d'investir localement avec un excellent suivi. »</p>
+          <div class="testi-author">
+            <div class="testi-avatar" style="background:linear-gradient(135deg, var(--gold), #8a6020);">AK</div>
+            <div>
+              <div class="testi-name">Aïssatou Konaré</div>
+              <div class="testi-role">Retraitée, Dakar</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4" data-aos="fade-up" data-aos-delay="160">
+        <div class="testi-card">
+          <div class="testi-stars">
+            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
+          </div>
+          <p class="testi-text">« La plateforme est intuitive et le module d'évaluation IA est vraiment pertinent. Nos taux de remboursement sont au-dessus de 95 %. »</p>
+          <div class="testi-author">
+            <div class="testi-avatar" style="background:linear-gradient(135deg, #2980b9, #1a5276);">IB</div>
+            <div>
+              <div class="testi-name">Ibrahima Ba</div>
+              <div class="testi-role">Bailleur partenaire, Saint-Louis</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===========================
+     CTA
+=========================== -->
+<section class="cta-section">
+  <div class="container" data-aos="zoom-in">
+    <h2>Prêt à rejoindre la révolution du financement alternatif ?</h2>
+    <p>Plus de 860 membres nous font confiance. Rejoignez-les dès aujourd'hui.</p>
+    <button class="btn-gc-white" id="ctaJoinBtn">
+      <i class="fas fa-user-plus"></i> Créer mon compte gratuitement
+    </button>
+  </div>
+</section>
+
+<!-- ===========================
+     FOOTER
+=========================== -->
+<footer>
+  <div class="container">
+    <div class="row gy-4">
+      <div class="col-lg-4 footer-brand-col">
+        <div class="footer-brand"><i class="fas fa-leaf me-2" style="color:var(--green-400);"></i>GreenCapital</div>
+        <p class="footer-desc">Plateforme pilote de financement alternatif & inclusif au Sénégal. Connectons les générations pour un impact économique durable.</p>
+        <div class="footer-socials">
+          <a href="#"><i class="fab fa-linkedin-in"></i></a>
+          <a href="#"><i class="fab fa-twitter"></i></a>
+          <a href="#"><i class="fab fa-facebook-f"></i></a>
+          <a href="#"><i class="fas fa-envelope"></i></a>
+        </div>
+      </div>
+      <div class="col-6 col-lg-2 footer-links">
+        <h6>Plateforme</h6>
+        <ul>
+          <li><a href="#">Comment ça marche</a></li>
+          <li><a href="#">Bailleurs</a></li>
+          <li><a href="#">Entrepreneurs</a></li>
+          <li><a href="#">Tarification</a></li>
+        </ul>
+      </div>
+      <div class="col-6 col-lg-2 footer-links">
+        <h6>Ressources</h6>
+        <ul>
+          <li><a href="#">FAQ</a></li>
+          <li><a href="#">Guide bailleur</a></li>
+          <li><a href="#">Guide entrepreneur</a></li>
+          <li><a href="#">Blog</a></li>
+        </ul>
+      </div>
+      <div class="col-6 col-lg-2 footer-links">
+        <h6>Légal</h6>
+        <ul>
+          <li><a href="#">CGU</a></li>
+          <li><a href="#">Politique de confidentialité</a></li>
+          <li><a href="#">Mentions légales</a></li>
+        </ul>
+      </div>
+      <div class="col-6 col-lg-2 footer-links">
+        <h6>Contact</h6>
+        <ul>
+          <li><a href="#">Nous contacter</a></li>
+          <li><a href="#">Partenaires</a></li>
+          <li><a href="#">Presse</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2025 GreenCapital – Prototype pilote | Financement alternatif & inclusif au Sénégal</span>
+      <span>Conçu avec <i class="fas fa-heart" style="color:var(--green-400);"></i> pour l'Afrique</span>
+    </div>
+  </div>
+</footer>
+
+<!-- ===========================
+     MODAL AUTH
+=========================== -->
+<div class="modal fade" id="authModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-body">
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <div class="gc-brand" style="font-size:1.25rem;">
+            <span class="leaf-icon" style="width:28px;height:28px;font-size:.8rem;"><i class="fas fa-leaf"></i></span>
+            GreenCapital
+          </div>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+
+        <!-- Tabs -->
+        <div class="auth-tabs">
+          <div class="auth-tab active" id="tabLoginBtn">Connexion</div>
+          <div class="auth-tab" id="tabRegisterBtn">Inscription</div>
+        </div>
+
+        <!-- Formulaire Connexion -->
+        <div id="loginForm">
+          <div class="form-group-gc">
+            <label class="form-label-gc">Adresse email</label>
+            <div class="input-icon-wrap">
+              <span class="input-icon"><i class="fas fa-envelope"></i></span>
+              <input type="email" class="form-control-gc" id="loginEmail" placeholder="votre@email.com">
+            </div>
+          </div>
+          <div class="form-group-gc">
+            <label class="form-label-gc">Mot de passe</label>
+            <div class="input-icon-wrap">
+              <span class="input-icon"><i class="fas fa-lock"></i></span>
+              <input type="password" class="form-control-gc" id="loginPassword" placeholder="••••••••">
+            </div>
+          </div>
+          <button class="btn-gc w-100 py-2 mt-1" id="doLoginBtn" style="justify-content:center; font-size:.95rem; border-radius:12px;">
+            Se connecter <i class="fas fa-arrow-right ms-1"></i>
+          </button>
+          <div class="modal-demo-hint">
+            <strong><i class="fas fa-info-circle me-1"></i> Comptes de démonstration :</strong>
+            bailleur@test.com · entrepreneur@test.com · admin@greencapital.sn<br>
+            <span style="color:var(--ink-muted);">(mot de passe quelconque pour bailleur/entrepreneur, admin123 pour admin)</span>
+          </div>
+        </div>
+
+        <!-- Formulaire Inscription -->
+        <div id="registerForm" style="display:none;">
+          <div class="form-group-gc">
+            <label class="form-label-gc">Nom complet</label>
+            <div class="input-icon-wrap">
+              <span class="input-icon"><i class="fas fa-user"></i></span>
+              <input type="text" class="form-control-gc" id="regName" placeholder="Prénom Nom">
+            </div>
+          </div>
+          <div class="form-group-gc">
+            <label class="form-label-gc">Adresse email</label>
+            <div class="input-icon-wrap">
+              <span class="input-icon"><i class="fas fa-envelope"></i></span>
+              <input type="email" class="form-control-gc" id="regEmail" placeholder="votre@email.com">
+            </div>
+          </div>
+          <div class="form-group-gc">
+            <label class="form-label-gc">Je suis</label>
+            <select class="form-control-gc" id="regRole" style="cursor:pointer;">
+              <option value="bailleur">Bailleur / Retraité</option>
+              <option value="entrepreneur">Jeune Entrepreneur</option>
+            </select>
+          </div>
+          <div class="form-group-gc">
+            <label class="form-label-gc">Mot de passe</label>
+            <div class="input-icon-wrap">
+              <span class="input-icon"><i class="fas fa-lock"></i></span>
+              <input type="password" class="form-control-gc" id="regPassword" placeholder="Minimum 4 caractères">
+            </div>
+          </div>
+          <button class="btn-gc w-100 py-2 mt-1" id="doRegisterBtn" style="justify-content:center; font-size:.95rem; border-radius:12px;">
+            Créer mon compte <i class="fas fa-arrow-right ms-1"></i>
+          </button>
+          <p class="text-center mt-2" style="font-size:.76rem; color:var(--ink-muted);">
+            <i class="fas fa-shield-alt me-1" style="color:var(--green-600);"></i>
+            Les administrateurs sont créés manuellement. En vous inscrivant, vous acceptez nos CGU.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast-container">
+  <div id="liveToast" class="toast gc-toast" data-bs-autohide="true" data-bs-delay="3500">
+    <div class="toast-header" id="toastHeader">
+      <i class="fas fa-check-circle me-2" id="toastIcon"></i>
+      <strong>GreenCapital</strong>
+      <button type="button" class="btn-close ms-auto" data-bs-dismiss="toast"></button>
+    </div>
+    <div class="toast-body" id="toastMessage">Notification</div>
+  </div>
+</div>
+
+<!-- ===========================
+     SCRIPTS
+=========================== -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+<script>
+  // ── AOS Init ──────────────────────────────────────────
+  AOS.init({ duration: 650, once: true, easing: 'ease-out-cubic' });
+
+  // ── Navbar scroll effect ──────────────────────────────
+  window.addEventListener('scroll', () => {
+    document.getElementById('mainNav').classList.toggle('scrolled', window.scrollY > 20);
+  });
+
+  // ── Counter animation ────────────────────────────────
+  function animateCounters() {
+    document.querySelectorAll('.counter').forEach(el => {
+      const target = parseInt(el.dataset.target);
+      const duration = 1800;
+      const step = target / (duration / 16);
+      let current = 0;
+      const timer = setInterval(() => {
+        current = Math.min(current + step, target);
+        el.textContent = Math.floor(current);
+        if (current >= target) clearInterval(timer);
+      }, 16);
+    });
+  }
+  // Trigger on scroll into view
+  const statsEl = document.querySelector('.stats-banner');
+  let counted = false;
+  const observer = new IntersectionObserver(entries => {
+    if (entries[0].isIntersecting && !counted) {
+      counted = true;
+      animateCounters();
+    }
+  }, { threshold: .3 });
+  if (statsEl) observer.observe(statsEl);
+
+  // ── USER DB ───────────────────────────────────────────
+  let usersDB = [
+    { id:1, name:"Mamadou Diallo",  email:"bailleur@test.com",       password:"any",      role:"bailleur",     status:"actif" },
+    { id:2, name:"Aïssatou Kane",   email:"entrepreneur@test.com",   password:"any",      role:"entrepreneur", status:"actif" },
+    { id:3, name:"Admin Green",     email:"admin@greencapital.sn",   password:"admin123", role:"admin",        status:"actif" }
+  ];
+
+  function saveUsers() { localStorage.setItem('gcUsers', JSON.stringify(usersDB)); }
+  function loadUsers() {
+    const s = localStorage.getItem('gcUsers');
+    if (s) usersDB = JSON.parse(s);
+    else saveUsers();
+  }
+
+  // ── Toast ─────────────────────────────────────────────
+  function showToast(msg, type = 'success') {
+    const el   = document.getElementById('liveToast');
+    const body = document.getElementById('toastMessage');
+    const hdr  = document.getElementById('toastHeader');
+    const ico  = document.getElementById('toastIcon');
+    body.textContent = msg;
+    hdr.className = 'toast-header';
+    const map = {
+      success: ['toast-header-success', 'fa-check-circle'],
+      danger:  ['toast-header-danger',  'fa-times-circle'],
+      warning: ['toast-header-warning', 'fa-exclamation-circle']
+    };
+    const [cls, icon] = map[type] || map.success;
+    hdr.classList.add(cls);
+    ico.className = `fas ${icon} me-2`;
+    new bootstrap.Toast(el).show();
+  }
+
+  // ── Auth Modal ────────────────────────────────────────
+  const authModalEl = document.getElementById('authModal');
+  let authModal;
+  document.addEventListener('DOMContentLoaded', () => {
+    authModal = new bootstrap.Modal(authModalEl);
+  });
+
+  function openModal(tab = 'login') {
+    switchTab(tab);
+    authModal.show();
+  }
+
+  function switchTab(tab) {
+    const lf   = document.getElementById('loginForm');
+    const rf   = document.getElementById('registerForm');
+    const tl   = document.getElementById('tabLoginBtn');
+    const tr   = document.getElementById('tabRegisterBtn');
+    if (tab === 'login') {
+      lf.style.display = 'block'; rf.style.display = 'none';
+      tl.classList.add('active'); tr.classList.remove('active');
+    } else {
+      lf.style.display = 'none'; rf.style.display = 'block';
+      tr.classList.add('active'); tl.classList.remove('active');
+    }
+  }
+
+  function getRolePage(role) {
+    const map = { bailleur:'bailleur.html', entrepreneur:'entrepreneur.html', admin:'admin.html' };
+    return map[role] || 'index.html';
+  }
+
+  function performLogin(email, password) {
+    if (!email || !password) { showToast('Veuillez remplir tous les champs.', 'warning'); return; }
+    const user = usersDB.find(u => u.email.toLowerCase() === email.toLowerCase());
+    if (!user) { showToast('Email ou mot de passe incorrect.', 'danger'); return; }
+    if (user.status !== 'actif') { showToast('Compte désactivé. Contactez l\'administrateur.', 'danger'); return; }
+    // Demo: accept any password for bailleur/entrepreneur, check for admin
+    if (user.role === 'admin' && password !== user.password) {
+      showToast('Mot de passe admin incorrect.', 'danger'); return;
+    }
+    sessionStorage.setItem('gcUser', JSON.stringify({ id:user.id, name:user.name, email:user.email, role:user.role }));
+    showToast(`Bienvenue, ${user.name} ! Redirection en cours…`, 'success');
+    setTimeout(() => window.location.href = getRolePage(user.role), 900);
+  }
+
+  function performRegister(name, email, password, role) {
+    if (!name || !email || !password || password.length < 4) {
+      showToast('Remplissez tous les champs (mot de passe : 4 caractères min).', 'warning'); return;
+    }
+    if (usersDB.find(u => u.email.toLowerCase() === email.toLowerCase())) {
+      showToast('Cet email est déjà utilisé.', 'danger'); return;
+    }
+    const newUser = { id: usersDB.length + 1, name, email, password, role, status:'actif', dateInscription: new Date().toISOString().slice(0,10) };
+    usersDB.push(newUser);
+    saveUsers();
+    sessionStorage.setItem('gcUser', JSON.stringify({ id:newUser.id, name, email, role }));
+    showToast(`Inscription réussie ! Bienvenue ${name}.`, 'success');
+    setTimeout(() => window.location.href = getRolePage(role), 900);
+  }
+
+  function presetActor(actor) {
+    const map = { bailleur:'bailleur@test.com', entrepreneur:'entrepreneur@test.com', admin:'admin@greencapital.sn' };
+    document.getElementById('loginEmail').value    = map[actor] || '';
+    document.getElementById('loginPassword').value = actor === 'admin' ? 'admin123' : 'any';
+    openModal('login');
+  }
+
+  function checkSession() {
+    const stored = sessionStorage.getItem('gcUser');
+    if (stored) window.location.href = getRolePage(JSON.parse(stored).role);
+  }
+
+  // ── Event Listeners ───────────────────────────────────
+  document.getElementById('showLoginBtn')?.addEventListener('click',    () => openModal('login'));
+  document.getElementById('showRegisterBtn')?.addEventListener('click', () => openModal('register'));
+  document.getElementById('heroLoginBtn')?.addEventListener('click',    () => openModal('login'));
+  document.getElementById('heroRegisterBtn')?.addEventListener('click', () => openModal('register'));
+  document.getElementById('ctaJoinBtn')?.addEventListener('click',      () => openModal('register'));
+  document.getElementById('featLearnMoreBtn')?.addEventListener('click',() => openModal('register'));
+
+  document.getElementById('tabLoginBtn')?.addEventListener('click',    () => switchTab('login'));
+  document.getElementById('tabRegisterBtn')?.addEventListener('click', () => switchTab('register'));
+
+  document.getElementById('doLoginBtn')?.addEventListener('click', () => {
+    performLogin(document.getElementById('loginEmail').value, document.getElementById('loginPassword').value);
+  });
+  document.getElementById('doRegisterBtn')?.addEventListener('click', () => {
+    performRegister(
+      document.getElementById('regName').value,
+      document.getElementById('regEmail').value,
+      document.getElementById('regPassword').value,
+      document.getElementById('regRole').value
+    );
+  });
+
+  document.querySelectorAll('.choose-actor-btn').forEach(btn => {
+    btn.addEventListener('click', () => presetActor(btn.dataset.actor));
+  });
+
+  // Enter key support
+  ['loginPassword', 'regPassword'].forEach((id, i) => {
+    document.getElementById(id)?.addEventListener('keypress', e => {
+      if (e.key === 'Enter') document.getElementById(i === 0 ? 'doLoginBtn' : 'doRegisterBtn').click();
+    });
+  });
+
+  // ── Init ──────────────────────────────────────────────
+  loadUsers();
+  checkSession();
+</script>
+</body>
+</html>
