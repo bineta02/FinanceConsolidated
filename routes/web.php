@@ -24,20 +24,20 @@ Route::get('/deconnexion', [AuthController::class, 'logout'])->name('logout');
 Route::middleware(['auth'])->group(function () {
 
     // Espace sécurisé strictement réservé aux Entrepreneurs
-    Route::middleware(['role:entrepreneur'])->group(function () {
-        Route::get('/entrepreneur/dashboard', [DashboardController::class, 'entrepreneurIndex'])
-            ->name('dashboard');
-    });
-
-    Route::middleware(['role:entrepreneur'])->group(function () {
-    
-    // Le tableau de bord (Géré par DashboardController)
+Route::middleware(['role:entrepreneur'])->group(function () {
+    // Ta route existante pour le Dashboard
     Route::get('/entrepreneur/dashboard', [DashboardController::class, 'entrepreneurIndex'])->name('dashboard');
 
-    // Le CRUD Profil (Géré par EntrepreneurController et stocké dans le dossier views/entrepreneur)
-    Route::get('/entrepreneur/profil/modifier', [\App\Http\Controllers\EntrepreneurController::class, 'edit'])->name('entrepreneur.profil.edit');
-    Route::put('/entrepreneur/profil/mettre-a-jour', [\App\Http\Controllers\EntrepreneurController::class, 'update'])->name('entrepreneur.profil.update');
-
+    // --- AJOUTE CES ROUTES ICI POUR COMPLÉTER LE DISPOSITIF ---
+    // 1. Afficher le formulaire de dépôt de projet
+    Route::get('/entrepreneur/projet/creer', [ProjetController::class, 'create'])->name('entrepreneur.projet.create');
+    
+    // 2. Traiter la soumission du formulaire et l'enregistrer en BDD
+    Route::post('/entrepreneur/projet/enregistrer', [ProjetController::class, 'store'])->name('entrepreneur.projet.store');
+    
+    // 3. Modifier le profil (si pas encore fait)
+    Route::get('/entrepreneur/profil/modifier', [EntrepreneurController::class, 'edit'])->name('entrepreneur.profil.edit');
+    Route::put('/entrepreneur/profil/mettre-a-jour', [EntrepreneurController::class, 'update'])->name('entrepreneur.profil.update');
 });
 
     // Espace sécurisé strictement réservé aux Bailleurs
