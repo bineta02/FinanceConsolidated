@@ -41,4 +41,22 @@ class EntrepreneurController extends Controller
         // Redirige vers le tableau de bord avec un message de succès
         return redirect()->route('dashboard')->with('success', 'Profil mis à jour avec succès !');
     }
+
+    public function financements()
+{
+    // Cette action demande à Laravel de charger la page "financements.blade.php"
+    return view('entrepreneur.financements');
+}
+
+public function echeances()
+{
+    // Cette action demande à Laravel de charger la page "echeances.blade.php"
+    return view('entrepreneur.echeances');
+}
+
+public function contrats()
+{
+    // Cette action demande à Laravel de charger la page "contrats.blade.php"
+    return view('entrepreneur.contrats');
+}
 }

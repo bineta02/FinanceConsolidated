@@ -44,10 +44,10 @@
       </li>
       
       <li class="nav-item">
-        <a class="nav-link" href="#">
-          <i class="fas fa-folder"></i> Mes projets
-        </a>
-      </li>
+  <a class="nav-link {{ Route::is('entrepreneur.projet.index') ? 'active' : '' }}" href="{{ route('entrepreneur.projet.index') }}">
+    <i class="fas fa-folder"></i> Mes projets
+  </a>
+</li>
 
       <li class="nav-item">
         <a class="nav-link {{ Route::is('entrepreneur.projet.create') ? 'active' : '' }}" href="{{ route('entrepreneur.projet.create') }}">
@@ -56,19 +56,19 @@
       </li>
 
       <li class="nav-item">
-        <a class="nav-link" href="#">
+        <a class="nav-link" href="{{ route('entrepreneur.financements') }}">
           <i class="fas fa-hand-holding-usd"></i> Financements reçus
         </a>
       </li>
 
       <li class="nav-item">
-        <a class="nav-link" href="#">
+        <a class="nav-link" href="{{ route('entrepreneur.echeances') }}">
           <i class="fas fa-calendar-alt"></i> Échéances & remboursements
         </a>
       </li>
 
       <li class="nav-item">
-        <a class="nav-link" href="#">
+        <a class="nav-link" href="{{ route('entrepreneur.contrats') }}">
           <i class="fas fa-file-contract"></i> Contrats & garanties
         </a>
       </li>
