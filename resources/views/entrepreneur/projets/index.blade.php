@@ -33,6 +33,7 @@
                         <th>Fonds Collectés</th>
                         <th>Statut</th>
                         <th>Date de soumission</th>
+                        <th class="text-end">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -52,6 +53,21 @@
                                 @endif
                             </td>
                             <td class="text-muted small">{{ $projet->created_at->format('d/m/Y à H:i') }}</td>
+                            <td>
+                                <div class="d-flex justify-content-end gap-2">
+                                    <a href="{{ route('entrepreneur.projet.edit', $projet->id) }}" class="btn btn-sm btn-outline-warning rounded-3" title="Modifier le projet">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+
+                                    <form action="{{ route('entrepreneur.projet.destroy', $projet->id) }}" method="POST" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer définitivement ce projet ?');" style="display: inline;">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-outline-danger rounded-3" title="Supprimer le projet">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
                         </tr>
                     @endforeach
                 </tbody>

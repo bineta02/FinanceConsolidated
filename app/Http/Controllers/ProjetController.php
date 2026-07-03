@@ -18,7 +18,7 @@ class ProjetController extends Controller
         $projets = Projet::where('id_utilisateur', Auth::id())->latest()->get();
 
         // Envoyer les projets à la vue index
-        return view('entrepreneur.index', compact('projets'));
+        return view('entrepreneur.projets.index', compact('projets'));
     }
 
     /**
@@ -26,7 +26,7 @@ class ProjetController extends Controller
      */
     public function create()
     {
-        return view('entrepreneur.create');
+        return view('entrepreneur.projets.create');
     }
 
     /**
@@ -74,7 +74,7 @@ class ProjetController extends Controller
             abort(403, 'Action non autorisée.');
         }
 
-        return view('entrepreneur.show', compact('projet'));
+        return view('entrepreneur.projets.show', compact('projet'));
     }
 
     /**
@@ -89,7 +89,7 @@ class ProjetController extends Controller
             abort(403, 'Action non autorisée.');
         }
 
-        return view('entrepreneur.edit', compact('projet'));
+        return view('entrepreneur.projets.edit', compact('projet'));
     }
 
     /**

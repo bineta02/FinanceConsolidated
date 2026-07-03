@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Projet;
 
 class DashboardController extends Controller
 {
@@ -30,12 +31,30 @@ class DashboardController extends Controller
     return view('dashboards.entrepreneur', compact('user', 'entrepreneur'));
 }
 
-    /**
-     * Affiche le tableau de bord du Bailleur (pour plus tard)
+     /**
+     * Page d'accueil / Tableau de bord du Bailleur
      */
     public function bailleurIndex()
     {
-        $user = Auth::user();
-        return view('dashboards.bailleur', compact('user'));
+        // On récupère tous les projets au statut 'en_attente' ou 'approuve' pour que le bailleur puisse les voir
+        $projetsDisponibles = Projet::whereIn('statut', ['en_attente', 'approuve'])
+                                    ->latest()
+                                    ->get();
+
+        // On envoie ces projets à la future vue du bailleur
+        return view('bailleur.dashboard', compact('projetsDisponibles'));
     }
+
+    /**
+ * Afficher les détails d'un projet pour le Bailleur
+ */
+public function bailleurShowProjet($id)
+{
+    // Récupérer le projet ou renvoyer une erreur 404
+    $projet = Projet::findOrFail($id);
+    
+    // On l'envoie vers une nouvelle vue dédiée
+    return view('bailleur.show_projet', compact('projet'));
+}
+
 }

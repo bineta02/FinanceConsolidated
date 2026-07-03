@@ -7,55 +7,55 @@ use App\Http\Controllers\ProjetController;
 use App\Http\Controllers\EntrepreneurController;
 
 // --- PAGE D'ACCUEIL / LANDING PAGE ---
-// Utilise la méthode verification() pour rediriger automatiquement si déjà connecté
 Route::get('/', [AuthController::class, 'verification'])->name('login');
 
-
 // --- TRAITEMENT AUTHENTIFICATION (MODALS) ---
-// Inscription multi-rôles
 Route::post('/inscription', [AuthController::class, 'register'])->name('register.submit');
-
-// Connexion
 Route::post('/connexion', [AuthController::class, 'login'])->name('login.submit');
-
-// Déconnexion
 Route::get('/deconnexion', [AuthController::class, 'logout'])->name('logout');
 
 
 // --- ESPACES SÉCURISÉS & COMPARTIMENTÉS PAR RÔLE ---
 Route::middleware(['auth'])->group(function () {
 
-    // Espace sécurisé strictement réservé aux Entrepreneurs
+// Espace sécurisé strictement réservé aux Entrepreneurs
 Route::middleware(['role:entrepreneur'])->group(function () {
-    // Ta route existante pour le Dashboard
-    Route::get('/entrepreneur/dashboard', [DashboardController::class, 'entrepreneurIndex'])->name('dashboard');
+        
+Route::get('/entrepreneur/dashboard', [DashboardController::class, 'entrepreneurIndex'])->name('dashboard');
 
-    // --- AJOUTE CES ROUTES ICI POUR COMPLÉTER LE DISPOSITIF ---
-    // 1. Afficher le formulaire de dépôt de projet
-    Route::get('/entrepreneur/projet/creer', [ProjetController::class, 'create'])->name('entrepreneur.projet.create');
-    Route::get('/entrepreneur/projet', [ProjetController::class, 'index'])->name('entrepreneur.projet.index');
-    
-    // 2. Traiter la soumission du formulaire et l'enregistrer en BDD
-    Route::post('/entrepreneur/projet/enregistrer', [ProjetController::class, 'store'])->name('entrepreneur.projet.store');
-    
-    // 3. Modifier le profil (si pas encore fait)
-    Route::get('/entrepreneur/profil/modifier', [EntrepreneurController::class, 'edit'])->name('entrepreneur.profil.edit');
-    Route::put('/entrepreneur/profil/mettre-a-jour', [EntrepreneurController::class, 'update'])->name('entrepreneur.profil.update');
-    
-    // Route pour l'onglet "Financements reçus"
-    Route::get('/entrepreneur/financements', [EntrepreneurController::class, 'financements'])->name('entrepreneur.financements');
+// --- GESTION DES PROJETS (CRUD COMPLET) ---
+Route::get('/entrepreneur/projet', [ProjetController::class, 'index'])->name('entrepreneur.projet.index');
+Route::get('/entrepreneur/projet/creer', [ProjetController::class, 'create'])->name('entrepreneur.projet.create');
+Route::post('/entrepreneur/projet/enregistrer', [ProjetController::class, 'store'])->name('entrepreneur.projet.store');
+        
+// Les 3 routes de gestion ajoutées pour modifier et supprimer :
+Route::get('/entrepreneur/projet/{id}/modifier', [ProjetController::class, 'edit'])->name('entrepreneur.projet.edit');
+Route::put('/entrepreneur/projet/{id}/mettre-a-jour', [ProjetController::class, 'update'])->name('entrepreneur.projet.update');
+Route::delete('/entrepreneur/projet/{id}/supprimer', [ProjetController::class, 'destroy'])->name('entrepreneur.projet.destroy');
 
-    // Route pour l'onglet "Échéances & remboursements"
-    Route::get('/entrepreneur/echeances', [EntrepreneurController::class, 'echeances'])->name('entrepreneur.echeances');
-
-    // Route pour l'onglet "Contrats & garanties"
-    Route::get('/entrepreneur/contrats', [EntrepreneurController::class, 'contrats'])->name('entrepreneur.contrats');
+        
+// --- GESTION DU PROFIL ---
+Route::get('/entrepreneur/profil/modifier', [EntrepreneurController::class, 'edit'])->name('entrepreneur.profil.edit');
+Route::put('/entrepreneur/profil/mettre-a-jour', [EntrepreneurController::class, 'update'])->name('entrepreneur.profil.update');
+        
+        
+// --- ONGLETS COMPLEMENTAIRES ---
+Route::get('/entrepreneur/financements', [EntrepreneurController::class, 'financements'])->name('entrepreneur.financements');
+Route::get('/entrepreneur/echeances', [EntrepreneurController::class, 'echeances'])->name('entrepreneur.echeances');
+Route::get('/entrepreneur/contrats', [EntrepreneurController::class, 'contrats'])->name('entrepreneur.contrats');
 });
 
-    // Espace sécurisé strictement réservé aux Bailleurs
-    Route::middleware(['role:bailleur'])->group(function () {
-        Route::get('/bailleur/dashboard', [DashboardController::class, 'bailleurIndex'])
-            ->name('bailleur.dashboard');
-    });
+// Espace sécurisé strictement réservé aux Bailleurs
+Route::middleware(['role:bailleur'])->group(function () {
+// Ton dashboard existant
+Route::get('/bailleur/dashboard', [DashboardController::class, 'bailleurIndex'])->name('bailleur.dashboard');
+    
+// --- NOUVELLES ROUTES POUR CONSULTER ET FINANCER ---
+// 1. Consulter les détails d'un projet spécifique
+Route::get('/bailleur/projet/{id}', [DashboardController::class, 'bailleurShowProjet'])->name('bailleur.projet.show');
+    
+// 2. Soumettre une offre financière (gérée par l'OffreController de ton Excel)
+Route::post('/bailleur/projet/{id}/offrir', [App\Http\Controllers\OffreController::class, 'store'])->name('bailleur.offre.store');
+});
     
 });
