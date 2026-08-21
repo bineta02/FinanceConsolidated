@@ -34,27 +34,20 @@ class DashboardController extends Controller
      /**
      * Page d'accueil / Tableau de bord du Bailleur
      */
-    public function bailleurIndex()
-    {
-        // On récupère tous les projets au statut 'en_attente' ou 'approuve' pour que le bailleur puisse les voir
-        $projetsDisponibles = Projet::whereIn('statut', ['en_attente', 'approuve'])
-                                    ->latest()
-                                    ->get();
+    use App\Models\Projet;
 
-        // On envoie ces projets à la future vue du bailleur
-        return view('bailleur.dashboard', compact('projetsDisponibles'));
-    }
-
-    /**
- * Afficher les détails d'un projet pour le Bailleur
- */
-public function bailleurShowProjet($id)
+public function bailleurIndex()
 {
-    // Récupérer le projet ou renvoyer une erreur 404
-    $projet = Projet::findOrFail($id);
-    
-    // On l'envoie vers une nouvelle vue dédiée
-    return view('bailleur.show_projet', compact('projet'));
+    // Projets en attente de financement
+    $projetsDisponibles = Projet::where('statut', 'soumis')->latest()->get();
+
+    return view('bailleur.dashboard', compact('projetsDisponibles'));
 }
 
+public function bailleurShowProjet($id)
+{
+    $projet = Projet::findOrFail($id);
+
+    return view('bailleur.show', compact('projet'));
+}
 }

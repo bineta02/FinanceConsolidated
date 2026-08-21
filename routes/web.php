@@ -58,6 +58,11 @@ Route::middleware(['auth'])->group(function () {
         // --- ROUTES POUR CONSULTER ET FINANCER ---
         Route::get('/bailleur/projet/{id}', [DashboardController::class, 'bailleurShowProjet'])->name('bailleur.projet.show');
         Route::post('/bailleur/projet/{id}/offrir', [App\Http\Controllers\OffreController::class, 'store'])->name('bailleur.offre.store');
+        Route::get('/explorer', [BailleurController::class, 'explorer'])->name('explorer');
+        Route::get('/investissements', [BailleurController::class, 'investissements'])->name('investissements');
+        Route::get('/echeances', [BailleurController::class, 'echeances'])->name('echeances');
+        Route::get('/criteres', [BailleurController::class, 'criteres'])->name('criteres');
+        Route::get('/contrats', [BailleurController::class, 'contrats'])->name('contrats');
     });
     
 });
