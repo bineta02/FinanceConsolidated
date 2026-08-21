@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Entrepreneur;
+use App\Models\Projet;
+use App\Models\Offre_financement;
 use Illuminate\Support\Facades\Auth;
 
 class EntrepreneurController extends Controller
@@ -42,10 +44,20 @@ class EntrepreneurController extends Controller
         return redirect()->route('dashboard')->with('success', 'Profil mis à jour avec succès !');
     }
 
-    public function financements()
+  public function financements()
 {
-    // Cette action demande à Laravel de charger la page "financements.blade.php"
-    return view('entrepreneur.financements');
+    $financements = Projet::where('id_utilisateur', Auth::id())
+        ->where('montant_collecte', '>', 0)
+        ->get();
+
+    return view('entrepreneur.financements', compact('financements'));
+}
+
+
+public function offresFinancement()
+{
+    $offres = Offre_financement::with('bailleur')->latest()->get();
+    return view('entrepreneur.offres_financement', compact('offres'));
 }
 
 public function echeances()

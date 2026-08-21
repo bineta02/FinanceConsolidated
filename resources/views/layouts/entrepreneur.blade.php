@@ -56,10 +56,20 @@
       </li>
 
       <li class="nav-item">
-        <a class="nav-link" href="{{ route('entrepreneur.financements') }}">
-          <i class="fas fa-hand-holding-usd"></i> Financements reçus
-        </a>
-      </li>
+    <a href="{{ route('entrepreneur.financements') }}" 
+       class="nav-link {{ request()->routeIs('entrepreneur.financements') ? 'active' : '' }}">
+        <i class="fas fa-hand-holding-usd me-2"></i>
+        <span>Financements reçus</span>
+    </a>
+</li>
+      <!-- Bouton Offres de financement -->
+<li class="nav-item">
+    <a href="{{ route('entrepreneur.offres_financement') }}" 
+       class="nav-link {{ request()->routeIs('entrepreneur.offres_financement') ? 'active' : '' }}">
+        <i class="fas fa-bullhorn me-2"></i>
+        <span>Offres de financement</span>
+    </a>
+</li>
 
       <li class="nav-item">
         <a class="nav-link" href="{{ route('entrepreneur.echeances') }}">

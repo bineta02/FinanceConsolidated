@@ -20,5 +20,6 @@ class Projet extends Model
         'categorie',
         'statut',
         'localisation',
+        'document_url',
     ];
 }

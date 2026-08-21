@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Projet;
 use App\Models\Entrepreneur;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class ProjetController extends Controller
 {
@@ -14,10 +15,7 @@ class ProjetController extends Controller
      */
     public function index()
     {
-        // Récupérer tous les projets liés à l'utilisateur connecté
         $projets = Projet::where('id_utilisateur', Auth::id())->latest()->get();
-
-        // Envoyer les projets à la vue index
         return view('entrepreneur.projets.index', compact('projets'));
     }
 
@@ -34,28 +32,33 @@ class ProjetController extends Controller
      */
     public function store(Request $request)
     {
-        // Validation des données du formulaire
         $request->validate([
-            'titre' => 'required|string|max:255',
-            'description' => 'required|string',
+            'titre'           => 'required|string|max:255',
+            'description'     => 'required|string',
             'montant_demande' => 'required|numeric|min:1',
-            'categorie' => 'required|string',
+            'categorie'       => 'required|string',
+            'localisation'    => 'required|string|max:255',
+            'document'        => 'nullable|file|mimes:pdf,doc,docx|max:5120',
         ]);
 
-        // Récupérer le profil entrepreneur de l'utilisateur connecté
         $entrepreneur = Entrepreneur::where('id_utilisateur', Auth::id())->firstOrFail();
 
-        // Insertion en base de données
+        $documentUrl = null;
+        if ($request->hasFile('document')) {
+            $documentUrl = $request->file('document')->store('documents_projets', 'public');
+        }
+
         Projet::create([
-            'id_utilisateur' => Auth::id(),
+            'id_utilisateur'  => Auth::id(),
             'id_entrepreneur' => $entrepreneur->id,
-            'titre' => $request->titre,
-            'description' => $request->description,
+            'titre'           => $request->titre,
+            'description'     => $request->description,
             'montant_demande' => $request->montant_demande,
-            'montant_collecte' => 0, 
-            'categorie' => $request->categorie,
-            'statut' => 'en_attente', 
-            'localisation' => 'Dakar', 
+            'montant_collecte'=> 0, 
+            'categorie'       => $request->categorie,
+            'localisation'    => $request->localisation,
+            'statut'          => 'en_attente', 
+            'document_url'    => $documentUrl,
         ]);
 
         return redirect()->route('entrepreneur.projet.index')->with('success', 'Votre projet a été déposé avec succès !');
@@ -66,10 +69,8 @@ class ProjetController extends Controller
      */
     public function show($id)
     {
-        // On récupère le projet par son ID ou on renvoie une erreur 404 si introuvable
         $projet = Projet::findOrFail($id);
 
-        // Sécurité : Vérifier que ce projet appartient bien à l'utilisateur connecté
         if ($projet->id_utilisateur !== Auth::id()) {
             abort(403, 'Action non autorisée.');
         }
@@ -78,13 +79,12 @@ class ProjetController extends Controller
     }
 
     /**
-     * 5. EDIT : Affiche le formulaire de modification avec les données actuelles
+     * 5. EDIT : Affiche le formulaire de modification
      */
     public function edit($id)
     {
         $projet = Projet::findOrFail($id);
 
-        // Sécurité : Empêcher de modifier le projet d'un autre
         if ($projet->id_utilisateur !== Auth::id()) {
             abort(403, 'Action non autorisée.');
         }
@@ -103,23 +103,48 @@ class ProjetController extends Controller
             abort(403, 'Action non autorisée.');
         }
 
-        // Validation identique au store
         $request->validate([
-            'titre' => 'required|string|max:255',
-            'description' => 'required|string',
+            'titre'           => 'required|string|max:255',
+            'description'     => 'required|string',
             'montant_demande' => 'required|numeric|min:1',
-            'categorie' => 'required|string',
+            'categorie'       => 'required|string',
+            'localisation'    => 'required|string|max:255',
+            'document'        => 'nullable|file|mimes:pdf,doc,docx|max:5120',
         ]);
 
-        // Mise à jour des données
-        $projet->update([
-            'titre' => $request->titre,
-            'description' => $request->description,
+        $data = [
+            'titre'           => $request->titre,
+            'description'     => $request->description,
             'montant_demande' => $request->montant_demande,
-            'categorie' => $request->categorie,
-        ]);
+            'categorie'       => $request->categorie,
+            'localisation'    => $request->localisation,
+        ];
+
+        if ($request->hasFile('document')) {
+            if ($projet->document_url && Storage::disk('public')->exists($projet->document_url)) {
+                Storage::disk('public')->delete($projet->document_url);
+            }
+            $data['document_url'] = $request->file('document')->store('documents_projets', 'public');
+        }
+
+        $projet->update($data);
 
         return redirect()->route('entrepreneur.projet.index')->with('success', 'Votre projet a été mis à jour avec succès !');
+    }
+
+    /**
+     * Supprime uniquement le document joint à un projet
+     */
+    public function destroyDocument($id)
+    {
+        $projet = Projet::where('id', $id)->where('id_utilisateur', Auth::id())->firstOrFail();
+
+        if ($projet->document_url && Storage::disk('public')->exists($projet->document_url)) {
+            Storage::disk('public')->delete($projet->document_url);
+            $projet->update(['document_url' => null]);
+        }
+
+        return redirect()->back()->with('success', 'Le document a été supprimé avec succès !');
     }
 
     /**
@@ -131,6 +156,10 @@ class ProjetController extends Controller
 
         if ($projet->id_utilisateur !== Auth::id()) {
             abort(403, 'Action non autorisée.');
+        }
+
+        if ($projet->document_url && Storage::disk('public')->exists($projet->document_url)) {
+            Storage::disk('public')->delete($projet->document_url);
         }
 
         $projet->delete();

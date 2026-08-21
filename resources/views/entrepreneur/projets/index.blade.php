@@ -55,10 +55,17 @@
                             <td class="text-muted small">{{ $projet->created_at->format('d/m/Y à H:i') }}</td>
                             <td>
                                 <div class="d-flex justify-content-end gap-2">
+                                    <!-- Bouton Voir les détails -->
+                                    <a href="{{ route('entrepreneur.projet.show', $projet->id) }}" class="btn btn-sm btn-outline-info rounded-3" title="Voir les détails">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+
+                                    <!-- Bouton Modifier -->
                                     <a href="{{ route('entrepreneur.projet.edit', $projet->id) }}" class="btn btn-sm btn-outline-warning rounded-3" title="Modifier le projet">
                                         <i class="fas fa-edit"></i>
                                     </a>
 
+                                    <!-- Bouton Supprimer -->
                                     <form action="{{ route('entrepreneur.projet.destroy', $projet->id) }}" method="POST" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer définitivement ce projet ?');" style="display: inline;">
                                         @csrf
                                         @method('DELETE')
