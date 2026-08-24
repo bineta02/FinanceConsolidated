@@ -71,10 +71,10 @@
 
       <!-- 5. Mes critères de financement -->
       <li class="nav-item">
-        <a class="nav-link {{ Route::is('bailleur.criteres') ? 'active' : '' }}" href="#">
-          <i class="fas fa-sliders-h"></i> Mes critères de financement
-        </a>
-      </li>
+  <a class="nav-link {{ Route::is('bailleur.criteres') ? 'active' : '' }}" href="{{ route('bailleur.criteres') }}">
+    <i class="fas fa-sliders-h"></i> Mes critères de financement
+  </a>
+</li>
 
       <!-- 6. Garanties & contrats -->
       <li class="nav-item">
@@ -82,6 +82,21 @@
           <i class="fas fa-shield-alt"></i> Garanties & contrats
         </a>
       </li>
+
+      <div class="top-bar">
+  <div>
+    <span class="ms-2 fw-semibold">
+      Bonjour, <span class="text-success">{{ Auth::user()->prenom }} {{ Auth::user()->nom }}</span>
+    </span>
+  </div>
+  <div class="d-flex align-items-center gap-3">
+    <!-- Bouton d'accès rapide au profil / critères -->
+    <a href="{{ route('bailleur.criteres') }}" class="btn btn-sm btn-outline-success rounded-4">
+      <i class="fas fa-user-cog me-1"></i> Mon Profil & Critères
+    </a>
+    <i class="fas fa-bell text-muted"></i>
+  </div>
+</div>
 
       <!-- Déconnexion -->
       <li class="nav-item mt-4">

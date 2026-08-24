@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProjetController;
 use App\Http\Controllers\EntrepreneurController;
+use App\Http\Controllers\BailleurController;
 
 // --- PAGE D'ACCUEIL / LANDING PAGE ---
 Route::get('/', [AuthController::class, 'verification'])->name('login');
@@ -61,7 +62,10 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/explorer', [BailleurController::class, 'explorer'])->name('explorer');
         Route::get('/investissements', [BailleurController::class, 'investissements'])->name('investissements');
         Route::get('/echeances', [BailleurController::class, 'echeances'])->name('echeances');
-        Route::get('/criteres', [BailleurController::class, 'criteres'])->name('criteres');
+        // Routes des critères
+        Route::get('/criteres', [BailleurController::class, 'criteres'])->name('bailleur.criteres');
+        Route::get('/criteres/edit', [BailleurController::class, 'editCriteres'])->name('bailleur.criteres.edit');
+        Route::post('/criteres', [BailleurController::class, 'updateCriteres'])->name('bailleur.criteres.update');
         Route::get('/contrats', [BailleurController::class, 'contrats'])->name('contrats');
     });
     

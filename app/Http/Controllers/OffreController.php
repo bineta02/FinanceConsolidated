@@ -3,37 +3,34 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Projet;
+use App\Models\Offre_financement;
+use Illuminate\Support\Facades\Auth;
 
 class OffreController extends Controller
 {
     /**
-     * Traite la soumission d'une offre de financement.
+     * Enregistre une proposition de financement formulée par un bailleur
      */
-    public function store(Request $request, $projet_id)
+    public function store(Request $request, $id)
     {
-        // 1. Validation basique des données du formulaire
+        $projet = Projet::findOrFail($id);
+
         $request->validate([
-            'montant' => 'required|numeric|min:1',
-            'conditions' => 'nullable|string',
+            'montant_offre' => 'required|numeric|min:10000',
+            'commentaire' => 'nullable|string|max:1000',
         ]);
 
-        // Pour le moment, on fait un dump pour vérifier que les données arrivent bien !
-        dd([
-            'message' => 'L\'offre a bien été capturée !',
-            'projet_id' => $projet_id,
-            'montant_injecte' => $request->input('montant'),
-            'conditions_note' => $request->input('conditions'),
+        // Création de l'offre de financement
+        Offre_financement::create([
+            'projet_id' => $projet->id,
+            'id_bailleur' => Auth::id(),
+            'montant' => $request->montant_offre,
+            'commentaire' => $request->commentaire,
+            'statut' => 'en_attente', // Statut initial soumis à l'entrepreneur
         ]);
 
-        /*
-        // Plus tard, la logique ressemblera à ça :
-        Offre::create([
-            'projet_id' => $projet_id,
-            'user_id' => auth()->id(),
-            'montant' => $request->montant,
-            'conditions' => $request->conditions,
-        ]);
-        return redirect()->back()->with('success', 'Votre offre a été soumise avec succès !');
-        */
+        return redirect()->route('bailleur.dashboard')
+            ->with('success', 'Votre proposition de financement a été soumise avec succès à l\'entrepreneur !');
     }
 }

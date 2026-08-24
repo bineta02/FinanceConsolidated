@@ -9,23 +9,17 @@ class Offre_financement extends Model
 {
     use HasFactory;
 
-    // Définissez les champs autorisés si nécessaire
+    protected $table = 'offre_financements'; // Ajuster le nom de la table si différent dans vos migrations
+
     protected $guarded = [];
 
-    /**
-     * Relation avec le Projet
-     */
     public function projet()
     {
-        // Remplacez 'id_projet' ou 'projet_id' par le nom exact de votre clé étrangère si différent
-        return $this->belongsTo(Projet::class, 'projet_id'); 
+        return $this->belongsTo(Projet::class, 'projet_id');
     }
 
-    /**
-     * Relation avec le Bailleur (Optionnel)
-     */
     public function bailleur()
     {
-        return $this->belongsTo(Bailleur::class, 'id_bailleur');
+        return $this->belongsTo(User::class, 'id_bailleur');
     }
 }
