@@ -19,7 +19,7 @@ class Offre_financement extends Model
     }
 
     public function bailleur()
-    {
-        return $this->belongsTo(User::class, 'id_bailleur');
-    }
+{
+    return $this->belongsTo(Bailleur::class, 'id_bailleur');
+}
 }

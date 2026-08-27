@@ -76,6 +76,13 @@
   </a>
 </li>
 
+
+<li class="nav-item">
+  <a class="nav-link {{ Route::is('bailleur.offres.*') ? 'active' : '' }}" href="{{ route('bailleur.offres.index') }}">
+    <i class="fas fa-hand-holding-usd"></i> Mes Offres de financement
+  </a>
+</li>
+
       <!-- 6. Garanties & contrats -->
       <li class="nav-item">
         <a class="nav-link {{ Route::is('bailleur.contrats') ? 'active' : '' }}" href="#">
@@ -91,7 +98,7 @@
   </div>
   <div class="d-flex align-items-center gap-3">
     <!-- Bouton d'accès rapide au profil / critères -->
-    <a href="{{ route('bailleur.criteres') }}" class="btn btn-sm btn-outline-success rounded-4">
+    <a href="{{ route('bailleur.criteres.edit') }}" class="btn btn-sm btn-outline-success rounded-4">
       <i class="fas fa-user-cog me-1"></i> Mon Profil & Critères
     </a>
     <i class="fas fa-bell text-muted"></i>

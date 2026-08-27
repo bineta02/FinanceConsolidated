@@ -26,4 +26,9 @@ class User extends Authenticatable
     {
         return $this->mot_de_passe;
     }
+
+    public function bailleur()
+{
+    return $this->hasOne(Bailleur::class, 'id_utilisateur');
+}
 }

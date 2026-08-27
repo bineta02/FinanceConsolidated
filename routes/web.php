@@ -6,6 +6,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProjetController;
 use App\Http\Controllers\EntrepreneurController;
 use App\Http\Controllers\BailleurController;
+use App\Http\Controllers\OffreController;
 
 // --- PAGE D'ACCUEIL / LANDING PAGE ---
 Route::get('/', [AuthController::class, 'verification'])->name('login');
@@ -45,7 +46,7 @@ Route::middleware(['auth'])->group(function () {
         // --- ONGLETS COMPLEMENTAIRES ---
         // Route ajoutée pour les offres de financement :
         Route::get('/entrepreneur/offres-financement', [EntrepreneurController::class, 'financements'])->name('entrepreneur.financements.index');
-        
+        Route::get('/offres-financement', [OffreController::class, 'indexEntrepreneur'])->name('bailleur.offres.index');
         Route::get('/entrepreneur/financements', [EntrepreneurController::class, 'financements'])->name('entrepreneur.financements');
         Route::get('/offres-financement', [EntrepreneurController::class, 'offresFinancement'])->name('entrepreneur.offres_financement');
         Route::get('/entrepreneur/echeances', [EntrepreneurController::class, 'echeances'])->name('entrepreneur.echeances');
@@ -57,7 +58,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/bailleur/dashboard', [DashboardController::class, 'bailleurIndex'])->name('bailleur.dashboard');
             
         // --- ROUTES POUR CONSULTER ET FINANCER ---
-        Route::get('/bailleur/projet/{id}', [DashboardController::class, 'bailleurShowProjet'])->name('bailleur.projet.show');
+        Route::get('/bailleur/projet/{id}', [DashboardController::class, 'bailleurShowProjet'])->name('bailleur.show_projet');
         Route::post('/bailleur/projet/{id}/offrir', [App\Http\Controllers\OffreController::class, 'store'])->name('bailleur.offre.store');
         Route::get('/explorer', [BailleurController::class, 'explorer'])->name('explorer');
         Route::get('/investissements', [BailleurController::class, 'investissements'])->name('investissements');
@@ -66,6 +67,12 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/criteres', [BailleurController::class, 'criteres'])->name('bailleur.criteres');
         Route::get('/criteres/edit', [BailleurController::class, 'editCriteres'])->name('bailleur.criteres.edit');
         Route::post('/criteres', [BailleurController::class, 'updateCriteres'])->name('bailleur.criteres.update');
+        // Routes des offres
+        Route::get('/offres', [OffreController::class, 'indexBailleur'])->name('bailleur.offres.index');
+        Route::get('/offres/creer', [OffreController::class, 'create'])->name('bailleur.offres.create');
+        Route::post('/bailleur/projet/{id}/proposition', [DashboardController::class, 'storeProposition'])->name('bailleur.propositions.store');
+        Route::post('/offres', [OffreController::class, 'store'])->name('bailleur.offres.store');
+
         Route::get('/contrats', [BailleurController::class, 'contrats'])->name('contrats');
     });
     

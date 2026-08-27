@@ -17,8 +17,8 @@ class Bailleur extends Model
 
     protected $guarded = []; // Autorise l'insertion de tous les champs
 
-    public function utilisateur()
-    {
-        return $this->belongsTo(User::class, 'id_utilisateur');
-    }
+   public function utilisateur()
+{
+    return $this->belongsTo(User::class, 'id_utilisateur');
+}
 }

@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Projet;
 use App\Models\Entrepreneur;
 use App\Models\Bailleur;
+use App\Models\Financement;
 
 class DashboardController extends Controller
 {
@@ -46,9 +47,9 @@ class DashboardController extends Controller
     // Construction de la requête pour les projets en attente
     $query = Projet::where('statut', 'en_attente');
 
-    // Filtrer par secteur si le bailleur en a défini un
-    if ($bailleur && !empty($bailleur->secteur_prefere)) {
-        $query->where('categorie', $bailleur->secteur_prefere);
+    // On utilise "secteurs_preferes" au pluriel
+    if ($bailleur && !empty($bailleur->secteurs_preferes)) {
+        $query->where('categorie', trim($bailleur->secteurs_preferes));
     }
 
     $projetsDisponibles = $query->latest()->get();
@@ -63,6 +64,40 @@ class DashboardController extends Controller
     {
         $projet = Projet::findOrFail($id);
 
-        return view('bailleur.show', compact('projet'));
+        return view('bailleur.show_projet', compact('projet'));
     }
+
+    public function storeProposition(Request $request, $id)
+{
+    $request->validate([
+        'montant' => 'required|numeric|min:1',
+        'conditions' => 'nullable|string',
+    ]);
+
+    try {
+        $projet = Projet::findOrFail($id);
+        $bailleur = auth()->user()->bailleur;
+
+        if (!$bailleur) {
+            return redirect()->back()->with('error', 'Profil bailleur non trouvé.');
+        }
+
+        Financement::create([
+            'id_utilisateur'  => $projet->id_utilisateur,
+            'id_bailleur'     => $bailleur->id,
+            'montant_accorde' => $request->montant,
+            'duree'           => 36,
+            'taux_interet'    => 5.5,
+            'statut'          => 'en_attente',
+            'date_accorde'    => now(),
+        ]);
+
+        return redirect()->back()->with('success', 'Votre proposition de financement a été soumise avec succès !');
+
+    } catch (\Exception $e) {
+        // Enregistre l'erreur exacte dans storage/logs/laravel.log
+        Log::error('Erreur financement: ' . $e->getMessage());
+        return redirect()->back()->with('error', 'Erreur lors de l\'enregistrement : ' . $e->getMessage());
+    }
+}
 }

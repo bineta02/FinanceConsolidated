@@ -41,7 +41,7 @@
                                 </div>
                             </div>
 
-                            <a href="{{ route('bailleur.projet.show', $projet->id) }}" class="btn btn-success w-100 rounded-4 py-2 mt-auto">
+                            <a href="{{ route('bailleur.show_projet', $projet->id) }}" class="btn btn-success w-100 rounded-4 py-2 mt-auto">
     <i class="fas fa-eye me-2"></i>Analyser le projet
 </a>
                         </div>
