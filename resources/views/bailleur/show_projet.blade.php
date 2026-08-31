@@ -110,6 +110,15 @@
                         <label class="form-label fw-semibold text-dark">Conditions ou note optionnelle</label>
                         <textarea name="conditions" class="form-control" rows="3" placeholder="Ex: Taux d'intérêt de 5.5%, durée 36 mois..."></textarea>
                     </div>
+                    <div class="d-flex align-items-center mb-3">
+    <div class="avatar bg-light text-success rounded-circle p-2 me-2">
+        <i class="fas fa-user fa-lg"></i>
+    </div>
+    <div>
+        <small class="text-muted d-block">Porteur du projet</small>
+        <strong class="text-dark">{{ $projet->entrepreneur->name ?? 'Nom non renseigné' }}</strong>
+    </div>
+</div>
 
                     <button type="submit" class="btn btn-success w-100 rounded-4 py-2 fw-semibold">
                         <i class="fas fa-paper-plane me-2"></i>Soumettre ma proposition

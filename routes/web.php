@@ -48,6 +48,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/entrepreneur/offres-financement', [EntrepreneurController::class, 'financements'])->name('entrepreneur.financements.index');
         Route::get('/offres-financement', [OffreController::class, 'indexEntrepreneur'])->name('bailleur.offres.index');
         Route::get('/entrepreneur/financements', [EntrepreneurController::class, 'financements'])->name('entrepreneur.financements');
+        Route::post('/entrepreneur/financements/{id}/accepter', [EntrepreneurController::class, 'accepterFinancement'])->name('entrepreneur.financements.accepter');
         Route::get('/offres-financement', [EntrepreneurController::class, 'offresFinancement'])->name('entrepreneur.offres_financement');
         Route::get('/entrepreneur/echeances', [EntrepreneurController::class, 'echeances'])->name('entrepreneur.echeances');
         Route::get('/entrepreneur/contrats', [EntrepreneurController::class, 'contrats'])->name('entrepreneur.contrats');

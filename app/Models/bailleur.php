@@ -11,14 +11,24 @@ class Bailleur extends Model
 
     protected $table = 'bailleurs';
 
-    // Configuration essentielle pour tes ID incrémentaux classiques
     public $incrementing = true;
     protected $keyType = 'int';
 
-    protected $guarded = []; // Autorise l'insertion de tous les champs
+    protected $guarded = [];
 
-   public function utilisateur()
-{
-    return $this->belongsTo(User::class, 'id_utilisateur');
-}
+    /**
+     * Relation avec l'utilisateur (compte User)
+     */
+    public function utilisateur()
+    {
+        return $this->belongsTo(User::class, 'id_utilisateur');
+    }
+
+    /**
+     * Relation avec les financements
+     */
+    public function financements()
+    {
+        return $this->hasMany(Financement::class, 'id_bailleur');
+    }
 }

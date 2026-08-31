@@ -29,6 +29,13 @@
                 </div>
             </div>
         @empty
+
+        <div class="mb-2">
+    <small class="text-muted d-block">
+        <i class="fas fa-user-circle me-1"></i>Porteur : 
+        <strong class="text-dark">{{ $projet->entrepreneur->name ?? $projet->entrepreneur->nom ?? 'Entrepreneur' }}</strong>
+    </small>
+</div>
             <div class="col-12">
                 <div class="alert alert-light border rounded-4 text-center py-4 text-muted">
                     Aucun projet disponible pour le moment.

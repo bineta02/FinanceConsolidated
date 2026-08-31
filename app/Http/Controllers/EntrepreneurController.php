@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Entrepreneur;
 use App\Models\Projet;
 use App\Models\Offre_financement;
+use App\Models\Financement;
 use Illuminate\Support\Facades\Auth;
 
 class EntrepreneurController extends Controller
@@ -46,11 +47,30 @@ class EntrepreneurController extends Controller
 
   public function financements()
 {
-    $financements = Projet::where('id_utilisateur', Auth::id())
-        ->where('montant_collecte', '>', 0)
+    $financements = Financement::with(['projet', 'bailleur.utilisateur'])
+        ->where('id_utilisateur', Auth::id())
+        ->latest()
         ->get();
 
     return view('entrepreneur.financements', compact('financements'));
+}
+
+// Méthode pour accepter l'offre
+public function accepterFinancement($id)
+{
+    $financement = Financement::findOrFail($id);
+    
+    // Mettre à jour le statut du financement
+    $financement->update([
+        'statut' => 'approuve' 
+    ]);
+
+    // Optionnel : Mettre à jour le montant collecté sur le projet
+    if ($financement->projet) {
+        $financement->projet->increment('montant_collecte', $financement->montant_accorde);
+    }
+
+    return redirect()->back()->with('success', 'Proposition de financement acceptée avec succès !');
 }
 
 

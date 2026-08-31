@@ -23,7 +23,7 @@ class Projet extends Model
         'document_url',
     ];
 
-    public function entrepreneur()
+   public function entrepreneur()
 {
     // Ajustez 'id_utilisateur' si le champ de votre clé étrangère s'appelle autrement
     return $this->belongsTo(User::class, 'id_utilisateur'); 
