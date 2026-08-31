@@ -73,7 +73,9 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/bailleur/projet/{id}/proposition', [DashboardController::class, 'storeProposition'])->name('bailleur.propositions.store');
         Route::post('/offres', [OffreController::class, 'store'])->name('bailleur.offres.store');
 
-        Route::get('/contrats', [BailleurController::class, 'contrats'])->name('contrats');
-    });
-    
+        Route::get('/bailleur/mes-investissements', [DashboardController::class, 'mesInvestissements'])->name('bailleur.investissements');
+        Route::get('/bailleur/explorer', [DashboardController::class, 'explorer'])->name('bailleur.explorer');
+        Route::get('/bailleur/echeances', [DashboardController::class, 'echeances'])->name('bailleur.echeances');
+        Route::get('/bailleur/contrats', [DashboardController::class, 'contrats'])->name('bailleur.contrats');    });
+            
 });

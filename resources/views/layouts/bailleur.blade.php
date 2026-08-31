@@ -49,25 +49,19 @@
       </li>
       
       <!-- 2. Explorer & Investir -->
-      <li class="nav-item">
-        <a class="nav-link {{ Route::is('bailleur.explorer') ? 'active' : '' }}" href="#">
-          <i class="fas fa-search-dollar"></i> Explorer & Investir
-        </a>
-      </li>
+      <a href="{{ route('bailleur.explorer') }}" class="nav-link">
+    <i class="fas fa-search me-2"></i> Explorer & Investir
+</a>
 
       <!-- 3. Mes investissements -->
-      <li class="nav-item">
-        <a class="nav-link {{ Route::is('bailleur.investissements') ? 'active' : '' }}" href="#">
-          <i class="fas fa-chart-line"></i> Mes investissements
-        </a>
-      </li>
+      <a href="{{ route('bailleur.investissements') }}" class="nav-link">
+    <i class="fas fa-chart-line me-2"></i> Mes investissements
+</a>
 
       <!-- 4. Échéances & Remboursements -->
-      <li class="nav-item">
-        <a class="nav-link {{ Route::is('bailleur.echeances') ? 'active' : '' }}" href="#">
-          <i class="fas fa-calendar-check"></i> Échéances & Remboursements
-        </a>
-      </li>
+      <a href="{{ route('bailleur.echeances') }}" class="nav-link">
+    <i class="fas fa-calendar-alt me-2"></i> Échéances & Remboursements
+</a>
 
       <!-- 5. Mes critères de financement -->
       <li class="nav-item">
@@ -84,11 +78,9 @@
 </li>
 
       <!-- 6. Garanties & contrats -->
-      <li class="nav-item">
-        <a class="nav-link {{ Route::is('bailleur.contrats') ? 'active' : '' }}" href="#">
-          <i class="fas fa-shield-alt"></i> Garanties & contrats
-        </a>
-      </li>
+      <a href="{{ route('bailleur.contrats') }}" class="nav-link">
+    <i class="fas fa-file-contract me-2"></i> Garanties & contrats
+</a>
 
       <div class="top-bar">
   <div>

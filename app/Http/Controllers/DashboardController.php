@@ -71,33 +71,70 @@ class DashboardController extends Controller
 {
     $request->validate([
         'montant' => 'required|numeric|min:1',
-        'conditions' => 'nullable|string',
+        'conditions' => 'nullable|string|max:5000',
     ]);
 
-    try {
-        $projet = Projet::findOrFail($id);
-        $bailleur = auth()->user()->bailleur;
+    $projet = Projet::findOrFail($id);
+    $bailleur = auth()->user()->bailleur;
 
-        if (!$bailleur) {
-            return redirect()->back()->with('error', 'Profil bailleur non trouvé.');
-        }
-
-        Financement::create([
-            'id_utilisateur'  => $projet->id_utilisateur,
-            'id_bailleur'     => $bailleur->id,
-            'montant_accorde' => $request->montant,
-            'duree'           => 36,
-            'taux_interet'    => 5.5,
-            'statut'          => 'en_attente',
-            'date_accorde'    => now(),
-        ]);
-
-        return redirect()->back()->with('success', 'Votre proposition de financement a été soumise avec succès !');
-
-    } catch (\Exception $e) {
-        // Enregistre l'erreur exacte dans storage/logs/laravel.log
-        Log::error('Erreur financement: ' . $e->getMessage());
-        return redirect()->back()->with('error', 'Erreur lors de l\'enregistrement : ' . $e->getMessage());
+    if (!$bailleur) {
+        return redirect()->back()->with('error', 'Profil bailleur introuvable.');
     }
+
+    // VÉRIFICATION ANTI-DOUBLON : Bloque si une offre est déjà en attente
+    $dejaSoumis = Financement::where('id_utilisateur', $projet->id_utilisateur)
+        ->where('id_bailleur', $bailleur->id)
+        ->where('statut', 'en_attente')
+        ->exists();
+
+    if ($dejaSoumis) {
+        return redirect()->back()->with('error', 'Vous avez déjà une proposition en attente pour ce projet.');
+    }
+
+    // Création de l'offre
+    Financement::create([
+        'id_utilisateur'  => $projet->id_utilisateur,
+        'id_bailleur'     => $bailleur->id,
+        'montant_accorde' => $request->montant,
+        'duree'           => 36,
+        'taux_interet'    => 5.5,
+        'statut'          => 'en_attente',
+        'date_accorde'    => now(),
+    ]);
+
+    return redirect()->back()->with('success', 'Votre proposition de financement a été soumise avec succès !');
+}
+
+public function mesInvestissements()
+{
+    $bailleur = auth()->user()->bailleur;
+
+    if (!$bailleur) {
+        return redirect()->back()->with('error', 'Profil bailleur introuvable.');
+    }
+
+    // Récupère tous les financements soumis par ce bailleur
+    $financements = Financement::with('projet')
+        ->where('id_bailleur', $bailleur->id)
+        ->orderBy('created_at', 'desc')
+        ->get();
+
+    return view('bailleur.investissements', compact('financements'));
+}
+
+public function explorer()
+{
+    $projets = Projet::with('entrepreneur')->latest()->get();
+    return view('bailleur.explorer', compact('projets'));
+}
+
+public function echeances()
+{
+    return view('bailleur.echeances');
+}
+
+public function contrats()
+{
+    return view('bailleur.contrats');
 }
 }
