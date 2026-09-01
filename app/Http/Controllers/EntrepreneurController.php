@@ -47,12 +47,16 @@ class EntrepreneurController extends Controller
 
   public function financements()
 {
+    // On charge le bailleur et son utilisateur relié
     $financements = Financement::with(['projet', 'bailleur.utilisateur'])
         ->where('id_utilisateur', Auth::id())
         ->latest()
         ->get();
 
-    return view('entrepreneur.financements', compact('financements'));
+    // On récupère le premier projet de l'entrepreneur connecté pour l'affichage
+    $projetEntrepreneur = Projet::where('id_utilisateur', Auth::id())->first();
+
+    return view('entrepreneur.financements', compact('financements', 'projetEntrepreneur'));
 }
 
 // Méthode pour accepter l'offre

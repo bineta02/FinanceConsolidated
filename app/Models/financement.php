@@ -11,7 +11,7 @@ class Financement extends Model
 
     public function projet()
     {
-        return $this->belongsTo(Projet::class, 'projet_id'); // Ou le nom exact de votre clé (ex: projet_id)
+        return $this->belongsTo(Projet::class, 'projet_id'); 
     }
 
     public function bailleur()

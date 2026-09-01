@@ -30,27 +30,41 @@
                     <tbody>
                         @forelse($financements as $financement)
                             @php
-                                // Récupération du Prénom et Nom depuis l'utilisateur hérité
-                                $userBailleur = $financement->bailleur->utilisateur ?? null;
+                                // 1. Récupération du Bailleur (Prénom + Nom)
+                                $userBailleur = $financement->bailleur->utilisateur ?? $financement->bailleur->user ?? null;
                                 
                                 $nomCompletBailleur = $userBailleur 
                                     ? trim(($userBailleur->prenom ?? $userBailleur->first_name ?? '') . ' ' . ($userBailleur->nom ?? $userBailleur->name ?? $userBailleur->last_name ?? '')) 
                                     : ($financement->bailleur->nom_organisation ?? 'Bailleur #' . $financement->id_bailleur);
 
-                                // Sécurité au cas où prénom et nom sont vides
                                 if (empty(trim($nomCompletBailleur))) {
                                     $nomCompletBailleur = $userBailleur->email ?? ('Bailleur #' . $financement->id_bailleur);
                                 }
 
-                                // Titre du projet
-                                $titreProjet = $financement->projet->titre 
-                                    ?? $financement->projet->nom 
-                                    ?? 'Projet #' . ($financement->projet_id ?? $financement->id_projet);
+                                // 2. Récupération du projet : via relation OU secours sur le premier projet de l'entrepreneur
+                                $projet = $financement->projet ?? \App\Models\Projet::where('id_utilisateur', Auth::id())->latest()->first();
+                                
+                                $titreProjet = $projet->titre ?? $projet->nom ?? $projet->titre_projet ?? 'Projet d\'Agriculture';
+                                $categorieProjet = $projet->categorie ?? $projet->secteur ?? $projet->domaine ?? $projet->secteur_activite ?? 'Agriculture';
+
+                                // 3. Récupération Robuste des Conditions (Gère NULL, "" et espaces vides)
+                                $rawConditions = trim(
+                                    $financement->conditions 
+                                    ?? $financement->description 
+                                    ?? $financement->note 
+                                    ?? $financement->modalites 
+                                    ?? $financement->details 
+                                    ?? ''
+                                );
+
+                                $conditionsTexte = !empty($rawConditions) 
+                                    ? $rawConditions 
+                                    : 'Aucune condition particulière';
                             @endphp
                             <tr>
                                 <td class="ps-4">
                                     <strong class="d-block text-dark">{{ $titreProjet }}</strong>
-                                    <small class="text-muted">Catégorie : {{ $financement->projet->categorie ?? 'Non applicable' }}</small>
+                                    <small class="text-muted">Catégorie : {{ $categorieProjet }}</small>
                                 </td>
                                 <td>
                                     <div class="d-flex align-items-center">
@@ -67,7 +81,7 @@
                                 </td>
                                 <td>
                                     <small class="text-muted d-block" style="max-width: 200px;">
-                                        {{ Str::limit($financement->conditions ?? 'Aucune condition particulière', 40) }}
+                                        {{ Str::limit($conditionsTexte, 40) }}
                                     </small>
                                 </td>
                                 <td>
@@ -136,7 +150,7 @@
                                                 <label class="fw-semibold text-dark mb-1"><i class="fas fa-clipboard-list me-1 text-secondary"></i> Conditions & Notes du bailleur :</label>
                                                 <div class="p-3 bg-light rounded-3 border">
                                                     <p class="text-secondary small mb-0" style="white-space: pre-line;">
-                                                        {{ $financement->conditions ?? 'Aucune condition particulière renseignée par le bailleur.' }}
+                                                        {{ $conditionsTexte }}
                                                     </p>
                                                 </div>
                                             </div>
