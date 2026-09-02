@@ -14,25 +14,34 @@ class DashboardController extends Controller
     /**
      * Affiche le tableau de bord de l'Entrepreneur
      */
-    public function entrepreneurIndex()
-    {
-        $user = Auth::user();
+   public function entrepreneurIndex()
+{
+    $user = Auth::user();
 
-        // On récupère le profil pour afficher les vraies données sur le dashboard
-        $entrepreneur = Entrepreneur::where('id_utilisateur', $user->id)->first();
+    // 1. Récupération ou création du profil entrepreneur
+    $entrepreneur = Entrepreneur::where('id_utilisateur', $user->id)->first();
 
-        // Si aucun profil n'existe en BD pour cet utilisateur, on le crée par défaut
-        if (!$entrepreneur) {
-            $entrepreneur = Entrepreneur::create([
-                'id_utilisateur' => $user->id,
-                'secteur_dactivite' => 'Non spécifié',
-                'description_profil' => 'Nouveau profil',
-                'annees_experiences' => 0
-            ]);
-        }
-
-        return view('dashboards.entrepreneur', compact('user', 'entrepreneur'));
+    if (!$entrepreneur) {
+        $entrepreneur = Entrepreneur::create([
+            'id_utilisateur'     => $user->id,
+            'secteur_dactivite'  => 'Non spécifié',
+            'description_profil' => 'Nouveau profil',
+            'annees_experiences' => 0
+        ]);
     }
+
+    // 2. Calcul des Fonds collectés (Offres acceptées/validées OU en attente)
+    $fondsCollectes = Financement::where('id_utilisateur', $user->id)
+        ->whereIn('statut', ['valide', 'accepte', 'approuve', 'en_attente']) // Inclut les offres reçues/en attente
+        ->sum('montant_accorde');
+
+    // 3. Calcul du Reste à rembourser (Offres validées/acceptées)
+    $resteARembourser = Financement::where('id_utilisateur', $user->id)
+        ->whereIn('statut', ['valide', 'accepte', 'approuve'])
+        ->sum('montant_accorde');
+
+    return view('dashboards.entrepreneur', compact('user', 'entrepreneur', 'fondsCollectes', 'resteARembourser'));
+}
 
     /**
      * Page d'accueil / Tableau de bord du Bailleur
@@ -69,41 +78,34 @@ class DashboardController extends Controller
 
     public function storeProposition(Request $request, $id)
 {
+    // 1. Récupérer le projet concerné par l'ID passé en paramètre ($id = 4)
+    $projet = Projet::findOrFail($id);
+
+    // 2. Récupérer l'enregistrement du bailleur connecté
+    $bailleur = Bailleur::where('id_utilisateur', Auth::id())->firstOrFail();
+
+    // 3. Validation des données (optionnel mais recommandé)
     $request->validate([
-        'montant' => 'required|numeric|min:1',
-        'conditions' => 'nullable|string|max:5000',
+        'montant'    => 'required|numeric',
+        'conditions' => 'nullable|string',
     ]);
 
-    $projet = Projet::findOrFail($id);
-    $bailleur = auth()->user()->bailleur;
-
-    if (!$bailleur) {
-        return redirect()->back()->with('error', 'Profil bailleur introuvable.');
-    }
-
-    // VÉRIFICATION ANTI-DOUBLON : Bloque si une offre est déjà en attente
-    $dejaSoumis = Financement::where('id_utilisateur', $projet->id_utilisateur)
-        ->where('id_bailleur', $bailleur->id)
-        ->where('statut', 'en_attente')
-        ->exists();
-
-    if ($dejaSoumis) {
-        return redirect()->back()->with('error', 'Vous avez déjà une proposition en attente pour ce projet.');
-    }
-
-    // Création de l'offre
+    // 4. Création de l'offre de financement
     Financement::create([
         'id_utilisateur'  => $projet->id_utilisateur,
         'id_bailleur'     => $bailleur->id,
+        'projet_id'       => $projet->id,
         'montant_accorde' => $request->montant,
-        'duree'           => 36,
-        'taux_interet'    => 5.5,
+        'duree'           => $request->duree ?? 36,
+        'taux_interet'    => $request->taux_interet ?? 5.5,
+        'conditions'      => $request->conditions,
         'statut'          => 'en_attente',
         'date_accorde'    => now(),
     ]);
 
     return redirect()->back()->with('success', 'Votre proposition de financement a été soumise avec succès !');
 }
+
 
 public function mesInvestissements()
 {

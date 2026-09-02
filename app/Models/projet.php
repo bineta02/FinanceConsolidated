@@ -9,7 +9,6 @@ class Projet extends Model
 {
     use HasFactory;
 
-    // Autoriser l'assignation de masse pour ces champs
     protected $fillable = [
         'id_utilisateur',
         'id_entrepreneur',
@@ -23,9 +22,20 @@ class Projet extends Model
         'document_url',
     ];
 
-   public function entrepreneur()
-{
-    // Ajustez 'id_utilisateur' si le champ de votre clé étrangère s'appelle autrement
-    return $this->belongsTo(User::class, 'id_utilisateur'); 
-}
+    // Relation principale
+    public function entrepreneur()
+    {
+        return $this->belongsTo(User::class, 'id_utilisateur'); 
+    }
+
+    // Alias pour la compatibilité
+    public function utilisateur()
+    {
+        return $this->belongsTo(User::class, 'id_utilisateur');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'id_utilisateur');
+    }
 }

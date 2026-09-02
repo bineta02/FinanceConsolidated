@@ -34,10 +34,45 @@
                     </thead>
                     <tbody>
                         @forelse($financements as $financement)
+                            @php
+                                // 1. Récupération via la relation 'entrepreneur' de Projet.php
+                                $entrepreneur = $financement->projet->entrepreneur 
+                                    ?? $financement->projet->utilisateur 
+                                    ?? $financement->projet->user 
+                                    ?? $financement->utilisateur 
+                                    ?? null;
+
+                                // 2. Si non trouvé via relation, récupération directe par l'ID en BDD
+                                if (!$entrepreneur) {
+                                    $userId = $financement->projet->id_utilisateur 
+                                        ?? $financement->projet->id_entrepreneur 
+                                        ?? $financement->id_utilisateur;
+                                    
+                                    if ($userId) {
+                                        $entrepreneur = \App\Models\User::find($userId);
+                                    }
+                                }
+
+                                // 3. Formate le nom et le prénom de l'entrepreneur
+                                $nomEntrepreneur = $entrepreneur 
+                                    ? trim(($entrepreneur->prenom ?? $entrepreneur->first_name ?? '') . ' ' . ($entrepreneur->nom ?? $entrepreneur->name ?? $entrepreneur->last_name ?? '')) 
+                                    : null;
+
+                                // Fallback si le nom/prénom est vide
+                                if (empty(trim($nomEntrepreneur))) {
+                                    $nomEntrepreneur = $entrepreneur->email 
+                                        ?? $financement->projet->nom_entreprise 
+                                        ?? ('Porteur ID : #' . ($financement->projet->id_utilisateur ?? $financement->id_utilisateur));
+                                }
+                            @endphp
                             <tr>
                                 <td class="ps-4">
-                                    <strong class="d-block text-dark">{{ $financement->projet->titre ?? 'Projet Agro/Business' }}</strong>
-                                    <small class="text-muted">Porteur ID : #{{ $financement->id_utilisateur }}</small>
+                                    <strong class="d-block text-dark">
+                                        {{ $financement->projet->titre ?? $financement->projet->nom ?? 'Projet Agro/Business' }}
+                                    </strong>
+                                    <small class="text-muted">
+                                        <i class="fas fa-user me-1"></i> {{ $nomEntrepreneur }}
+                                    </small>
                                 </td>
                                 <td>
                                     <span class="fw-bold text-success">{{ number_format($financement->montant_accorde, 0, ',', ' ') }} FCFA</span>
@@ -49,7 +84,7 @@
                                 <td>
                                     @if($financement->statut == 'en_attente')
                                         <span class="badge bg-warning text-dark rounded-pill px-3">En attente</span>
-                                    @elseif($financement->statut == 'valide' || $financement->statut == 'accepte')
+                                    @elseif(in_array($financement->statut, ['valide', 'accepte', 'approuve', 'approuvee']))
                                         <span class="badge bg-success rounded-pill px-3">Accepté</span>
                                     @else
                                         <span class="badge bg-secondary rounded-pill px-3">{{ ucfirst($financement->statut) }}</span>
@@ -57,7 +92,7 @@
                                 </td>
                                 <td class="text-end pe-4">
                                     @if($financement->projet)
-                                        <a href="{{ route('bailleur.projet.show', $financement->projet->id) }}" class="btn btn-sm btn-light border rounded-3">
+                                        <a href="{{ route('bailleur.show_projet', $financement->projet->id) }}" class="btn btn-sm btn-light border rounded-3">
                                             <i class="fas fa-eye me-1"></i> Voir Projet
                                         </a>
                                     @else
