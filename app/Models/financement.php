@@ -19,6 +19,11 @@ class Financement extends Model
         return $this->belongsTo(Bailleur::class, 'id_bailleur');
     }
 
+    public function contrat()
+{
+    return $this->hasOne(Contrat::class, 'financement_id');
+}
+
     
 
 }

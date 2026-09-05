@@ -8,6 +8,7 @@ use App\Models\Projet;
 use App\Models\Entrepreneur;
 use App\Models\Bailleur;
 use App\Models\Financement;
+use App\Models\Contrat;
 
 class DashboardController extends Controller
 {
@@ -130,13 +131,58 @@ public function explorer()
     return view('bailleur.explorer', compact('projets'));
 }
 
+// Page Échéances & Remboursements
 public function echeances()
 {
-    return view('bailleur.echeances');
+    $bailleur = Bailleur::where('id_utilisateur', Auth::id())->firstOrFail();
+
+    $financements = Financement::with(['projet.entrepreneur'])
+        ->where('id_bailleur', $bailleur->id)
+        ->whereIn('statut', ['valide', 'accepte', 'approuve'])
+        ->latest()
+        ->get();
+
+    return view('bailleur.echeances', compact('financements'));
 }
 
+// Page Garanties & Contrats
 public function contrats()
 {
-    return view('bailleur.contrats');
+    $bailleur = Bailleur::where('id_utilisateur', Auth::id())->firstOrFail();
+
+    // On charge 'projet.entrepreneur' ET 'contrat'
+    $financements = Financement::with(['projet.entrepreneur', 'contrat'])
+        ->where('id_bailleur', $bailleur->id)
+        ->whereIn('statut', ['valide', 'accepte', 'approuve'])
+        ->latest()
+        ->get();
+
+    return view('bailleur.contrats', compact('financements'));
+}
+
+public function uploadContrat(Request $request, $financementId)
+{
+    $request->validate([
+        'fichier_contrat' => 'required|mimes:pdf,doc,docx|max:5120', // 5MB max
+        'date_signature'  => 'required|date',
+    ]);
+
+    $financement = Financement::findOrFail($financementId);
+
+    // Sauvegarde du fichier dans storage/app/public/contrats
+    $path = $request->file('fichier_contrat')->store('contrats', 'public');
+
+    // Mettre à jour ou créer l'entrée contrat (avec le champ 'contenu' pour éviter l'erreur 1364)
+    Contrat::updateOrCreate(
+        ['financement_id' => $financement->id],
+        [
+            'date_signature' => $request->date_signature,
+            'fichier_url'    => $path,
+            'contenu'        => 'Contrat officiel de financement', 
+            'statut'         => 'Signé',
+        ]
+    );
+
+    return redirect()->back()->with('success', 'Le contrat a été importé avec succès !');
 }
 }

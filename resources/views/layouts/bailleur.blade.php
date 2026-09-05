@@ -58,10 +58,7 @@
     <i class="fas fa-chart-line me-2"></i> Mes investissements
 </a>
 
-      <!-- 4. Échéances & Remboursements -->
-      <a href="{{ route('bailleur.echeances') }}" class="nav-link">
-    <i class="fas fa-calendar-alt me-2"></i> Échéances & Remboursements
-</a>
+      
 
       <!-- 5. Mes critères de financement -->
       <li class="nav-item">
@@ -76,6 +73,11 @@
     <i class="fas fa-hand-holding-usd"></i> Mes Offres de financement
   </a>
 </li>
+
+<!-- 4. Échéances & Remboursements -->
+      <a href="{{ route('bailleur.echeances') }}" class="nav-link">
+    <i class="fas fa-calendar-alt me-2"></i> Échéances & Remboursements
+</a>
 
       <!-- 6. Garanties & contrats -->
       <a href="{{ route('bailleur.contrats') }}" class="nav-link">

@@ -52,6 +52,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/offres-financement', [EntrepreneurController::class, 'offresFinancement'])->name('entrepreneur.offres_financement');
         Route::get('/entrepreneur/echeances', [EntrepreneurController::class, 'echeances'])->name('entrepreneur.echeances');
         Route::get('/entrepreneur/contrats', [EntrepreneurController::class, 'contrats'])->name('entrepreneur.contrats');
+        
     });
 
     // Espace sécurisé strictement réservé aux Bailleurs
@@ -77,6 +78,10 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/bailleur/mes-investissements', [DashboardController::class, 'mesInvestissements'])->name('bailleur.investissements');
         Route::get('/bailleur/explorer', [DashboardController::class, 'explorer'])->name('bailleur.explorer');
         Route::get('/bailleur/echeances', [DashboardController::class, 'echeances'])->name('bailleur.echeances');
-        Route::get('/bailleur/contrats', [DashboardController::class, 'contrats'])->name('bailleur.contrats');    });
+        Route::get('/bailleur/contrats', [DashboardController::class, 'contrats'])->name('bailleur.contrats');
+        Route::post('/bailleur/contrats/{financementId}/upload', [DashboardController::class, 'uploadContrat'])
+        ->name('bailleur.contrats.upload');
+        
+           });
             
 });
