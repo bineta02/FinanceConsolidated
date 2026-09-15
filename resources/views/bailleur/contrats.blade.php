@@ -15,7 +15,7 @@
 
     <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
         <div class="card-body p-0">
-            @if($financements->count() > 0)
+            @if(isset($financements) && $financements->count() > 0)
                 <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0">
                         <thead class="bg-light">
@@ -46,16 +46,35 @@
                                         <span class="fw-bold text-success">{{ number_format($financement->montant_accorde, 0, ',', ' ') }} FCFA</span>
                                     </td>
                                     <td>{{ $financement->duree }} mois ({{ $financement->taux_interet }}%)</td>
+                                    
+                                    {{-- Date de signature --}}
                                     <td>
                                         {{ $contrat && $contrat->date_signature ? \Carbon\Carbon::parse($contrat->date_signature)->format('d/m/Y') : '-' }}
                                     </td>
+
+                                    {{-- Statut dynamique du contrat --}}
                                     <td>
-                                        <span class="badge {{ $contrat ? 'bg-success' : 'bg-warning text-dark' }} rounded-pill px-3">
-                                            {{ $contrat->statut ?? 'En attente de contrat' }}
-                                        </span>
+                                        @if(!$contrat)
+                                            <span class="badge bg-warning text-dark rounded-pill px-3">
+                                                <i class="fas fa-exclamation-triangle me-1"></i> En attente de contrat
+                                            </span>
+                                        @elseif(in_array(strtolower($contrat->statut), ['signe', 'signé', 'valide', 'actif']))
+                                            <span class="badge bg-success rounded-pill px-3">
+                                                <i class="fas fa-check-circle me-1"></i> Signé
+                                            </span>
+                                        @elseif(in_array(strtolower($contrat->statut), ['a_signer', 'en_attente', 'en attente de signature', 'à signé']))
+                                            <span class="badge bg-info text-dark rounded-pill px-3">
+                                                <i class="fas fa-clock me-1"></i> En attente de signature
+                                            </span>
+                                        @else
+                                            <span class="badge bg-secondary rounded-pill px-3">
+                                                {{ $contrat->statut }}
+                                            </span>
+                                        @endif
                                     </td>
+
                                     <td class="text-end pe-4">
-                                        {{-- Boutons Voir et Télécharger si un contrat existe --}}
+                                        {{-- Boutons Voir et Télécharger si le contrat est présent --}}
                                         @if($contrat && !empty($contrat->fichier_url))
                                             <div class="btn-group me-2" role="group">
                                                 <a href="{{ asset('storage/' . $contrat->fichier_url) }}" target="_blank" class="btn btn-sm btn-outline-success" title="Visualiser dans le navigateur">
@@ -79,25 +98,21 @@
                                                     <form action="{{ route('bailleur.contrats.upload', $financement->id) }}" method="POST" enctype="multipart/form-data">
                                                         @csrf
                                                         <div class="modal-header border-0 pb-0">
-                                                            <h5 class="modal-title fw-bold">Ajouter un Contrat PDF</h5>
+                                                            <h5 class="modal-title fw-bold">Transmission du Contrat</h5>
                                                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                         </div>
                                                         <div class="modal-body">
                                                             <p class="text-muted small mb-3">Projet : <strong>{{ $financement->projet->titre ?? 'Projet' }}</strong></p>
 
                                                             <div class="mb-3">
-                                                                <label class="form-label fw-semibold">Date de signature</label>
-                                                                <input type="date" name="date_signature" class="form-control" value="{{ $contrat->date_signature ?? date('Y-m-d') }}" required>
-                                                            </div>
-
-                                                            <div class="mb-3">
                                                                 <label class="form-label fw-semibold">Fichier du contrat (PDF/DOC)</label>
                                                                 <input type="file" name="fichier_contrat" class="form-control" accept=".pdf,.doc,.docx" required>
+                                                                <div class="form-text">Le document sera transmis à l'entrepreneur pour examen et signature.</div>
                                                             </div>
                                                         </div>
                                                         <div class="modal-footer border-0 pt-0">
                                                             <button type="button" class="btn btn-light rounded-3" data-bs-dismiss="modal">Annuler</button>
-                                                            <button type="submit" class="btn btn-success rounded-3">Enregistrer le contrat</button>
+                                                            <button type="submit" class="btn btn-success rounded-3">Transmettre le contrat</button>
                                                         </div>
                                                     </form>
                                                 </div>

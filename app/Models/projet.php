@@ -38,4 +38,17 @@ class Projet extends Model
     {
         return $this->belongsTo(User::class, 'id_utilisateur');
     }
+
+    public function financements()
+{
+    return $this->hasMany(Financement::class, 'projet_id'); // ou 'id_projet' selon votre schéma
+}
+
+// Calcul dynamique du montant collecté
+public function getMontantCollecteAttribute()
+{
+    return $this->financements()
+        ->whereIn('statut', ['valide', 'accepte', 'approuve'])
+        ->sum('montant_accorde');
+}
 }

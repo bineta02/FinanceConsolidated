@@ -44,10 +44,10 @@
       </li>
       
       <li class="nav-item">
-  <a class="nav-link {{ Route::is('entrepreneur.projet.index') ? 'active' : '' }}" href="{{ route('entrepreneur.projet.index') }}">
-    <i class="fas fa-folder"></i> Mes projets
-  </a>
-</li>
+        <a class="nav-link {{ Route::is('entrepreneur.projet.index') ? 'active' : '' }}" href="{{ route('entrepreneur.projet.index') }}">
+          <i class="fas fa-folder"></i> Mes projets
+        </a>
+      </li>
 
       <li class="nav-item">
         <a class="nav-link {{ Route::is('entrepreneur.projet.create') ? 'active' : '' }}" href="{{ route('entrepreneur.projet.create') }}">
@@ -56,20 +56,21 @@
       </li>
 
       <li class="nav-item">
-    <a href="{{ route('entrepreneur.financements') }}" 
-       class="nav-link {{ request()->routeIs('entrepreneur.financements') ? 'active' : '' }}">
-        <i class="fas fa-hand-holding-usd me-2"></i>
-        <span>Financements reçus</span>
-    </a>
-</li>
+        <a href="{{ route('entrepreneur.financements') }}" 
+           class="nav-link {{ request()->routeIs('entrepreneur.financements') ? 'active' : '' }}">
+            <i class="fas fa-hand-holding-usd me-2"></i>
+            <span>Financements reçus</span>
+        </a>
+      </li>
+
       <!-- Bouton Offres de financement -->
-<li class="nav-item">
-    <a href="{{ route('entrepreneur.offres_financement') }}" 
-       class="nav-link {{ request()->routeIs('entrepreneur.offres_financement') ? 'active' : '' }}">
-        <i class="fas fa-bullhorn me-2"></i>
-        <span>Offres de financement</span>
-    </a>
-</li>
+      <li class="nav-item">
+        <a href="{{ route('entrepreneur.offres_financement') }}" 
+           class="nav-link {{ request()->routeIs('entrepreneur.offres_financement') ? 'active' : '' }}">
+            <i class="fas fa-bullhorn me-2"></i>
+            <span>Offres de financement</span>
+        </a>
+      </li>
 
       <li class="nav-item">
         <a class="nav-link" href="{{ route('entrepreneur.echeances') }}">
@@ -104,7 +105,51 @@
           Bienvenue, <span class="text-success">{{ Auth::user()->prenom }} {{ Auth::user()->nom }}</span>
         </span>
       </div>
-      <div><i class="fas fa-bell text-muted"></i></div>
+
+      <!-- BOUTON DE NOTIFICATION DYNAMIQUE -->
+      @php
+        $notificationsNonLues = \App\Models\Notification::where('id_utilisateur', Auth::id())
+            ->where('lue', false)
+            ->latest()
+            ->get();
+      @endphp
+
+      <div class="dropdown">
+        <button type="button" class="btn btn-light position-relative rounded-circle p-2 border-0 shadow-sm" id="dropdownMenuNotif" data-bs-toggle="dropdown" aria-expanded="false" style="width: 42px; height: 42px;">
+          <i class="fas fa-bell text-secondary fs-5"></i>
+          @if($notificationsNonLues->count() > 0)
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.7rem;">
+              {{ $notificationsNonLues->count() }}
+            </span>
+          @endif
+        </button>
+
+        <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-4 p-2 mt-2" aria-labelledby="dropdownMenuNotif" style="width: 320px; max-height: 400px; overflow-y: auto;">
+          <li class="dropdown-header fw-bold text-dark border-bottom pb-2 mb-2 d-flex justify-content-between align-items-center">
+            <span>Notifications</span>
+            @if($notificationsNonLues->count() > 0)
+              <span class="badge bg-success rounded-pill">{{ $notificationsNonLues->count() }} nouvelle(s)</span>
+            @endif
+          </li>
+
+          @forelse($notificationsNonLues as $notif)
+            <li>
+              <a class="dropdown-item p-2 rounded-3 mb-1 bg-light text-wrap" href="{{ $notif->lien ?? route('entrepreneur.contrats') }}">
+                <strong class="d-block text-dark small">{{ $notif->titre }}</strong>
+                <span class="text-muted small d-block mb-1">{{ $notif->message }}</span>
+                <small class="text-success" style="font-size: 0.72rem;">{{ $notif->created_at ? $notif->created_at->diffForHumans() : '' }}</small>
+              </a>
+            </li>
+          @empty
+            <li class="text-center py-3 text-muted small">
+              <i class="fas fa-bell-slash d-block mb-1 fs-5 text-secondary"></i>
+              Aucune nouvelle notification
+            </li>
+          @endforelse
+        </ul>
+      </div>
+      <!-- FIN DU BOUTON NOTIFICATION -->
+
     </div>
 
     @yield('content')

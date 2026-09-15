@@ -42,8 +42,11 @@
                             <td class="fw-bold text-dark">{{ $projet->titre }}</td>
                             <td><span class="badge bg-light text-dark border px-3 py-2 rounded-4">{{ $projet->categorie }}</span></td>
                             <td class="fw-semibold">{{ number_format($projet->montant_demande, 0, ',', ' ') }} FCFA</td>
-                            <td class="text-success fw-semibold">{{ number_format($projet->montant_collecte, 0, ',', ' ') }} FCFA</td>
-                            <td>
+<td>
+    <span class="fw-bold text-success">
+        {{ number_format($projet->montant_collecte, 0, ',', ' ') }} FCFA
+    </span>
+</td>                            <td>
                                 @if($projet->statut === 'en_attente')
                                     <span class="badge bg-warning-subtle text-warning border border-warning px-3 py-2 rounded-4"> En attente</span>
                                 @elseif($projet->statut === 'approuve')

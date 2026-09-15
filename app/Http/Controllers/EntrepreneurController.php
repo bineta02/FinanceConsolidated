@@ -7,6 +7,7 @@ use App\Models\Entrepreneur;
 use App\Models\Projet;
 use App\Models\Offre_financement;
 use App\Models\Financement;
+use App\Models\Contrat;
 use Illuminate\Support\Facades\Auth;
 
 class EntrepreneurController extends Controller
@@ -92,7 +93,28 @@ public function echeances()
 
 public function contrats()
 {
-    // Cette action demande à Laravel de charger la page "contrats.blade.php"
-    return view('entrepreneur.contrats');
+    $userId = Auth::id();
+
+    $financements = Financement::with(['projet', 'bailleur.utilisateur', 'contrat'])
+        ->whereHas('projet', function ($query) use ($userId) {
+            $query->where('id_utilisateur', $userId);
+        })
+        ->latest()
+        ->get();
+
+    return view('entrepreneur.contrats', compact('financements'));
+}
+// Action de signature par l'entrepreneur
+public function signerContrat($id)
+{
+    $contrat = Contrat::findOrFail($id);
+
+    // Mettre à jour la vraie date de signature et le statut
+    $contrat->update([
+        'date_signature' => now(),
+        'statut'         => 'Signé',
+    ]);
+
+    return redirect()->back()->with('success', 'Félicitations ! Le contrat a été validé et signé avec succès.');
 }
 }

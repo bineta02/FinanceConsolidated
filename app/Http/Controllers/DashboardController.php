@@ -163,26 +163,36 @@ public function contrats()
 public function uploadContrat(Request $request, $financementId)
 {
     $request->validate([
-        'fichier_contrat' => 'required|mimes:pdf,doc,docx|max:5120', // 5MB max
-        'date_signature'  => 'required|date',
+        'fichier_contrat' => 'required|mimes:pdf,doc,docx|max:5120',
     ]);
 
     $financement = Financement::findOrFail($financementId);
-
-    // Sauvegarde du fichier dans storage/app/public/contrats
     $path = $request->file('fichier_contrat')->store('contrats', 'public');
 
-    // Mettre à jour ou créer l'entrée contrat (avec le champ 'contenu' pour éviter l'erreur 1364)
-    Contrat::updateOrCreate(
+    // Mettre 'a_signer' (compatible avec le type VARCHAR)
+    $contrat = Contrat::updateOrCreate(
         ['financement_id' => $financement->id],
         [
-            'date_signature' => $request->date_signature,
+            'date_signature' => null,
             'fichier_url'    => $path,
-            'contenu'        => 'Contrat officiel de financement', 
-            'statut'         => 'Signé',
+            'contenu'        => 'Contrat transmis par le bailleur',
+            'statut'         => 'a_signer', 
         ]
     );
 
-    return redirect()->back()->with('success', 'Le contrat a été importé avec succès !');
+    // Notification à l'entrepreneur
+    $entrepreneurId = $financement->projet->id_utilisateur ?? $financement->id_utilisateur;
+    
+    if ($entrepreneurId) {
+        \App\Models\Notification::create([
+            'id_utilisateur' => $entrepreneurId,
+            'titre'          => 'Nouveau contrat disponible',
+            'contenu'        => 'Un contrat a été déposé pour votre projet "' . ($financement->projet->titre ?? 'Projet') . '". Veuillez le consulter et le signer.',
+            'type'           => 'contrat',
+            'lue'         => false,
+        ]);
+    }
+
+    return redirect()->back()->with('success', 'Contrat transmis avec succès à l’entrepreneur !');
 }
 }
