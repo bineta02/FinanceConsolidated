@@ -49,7 +49,6 @@
                                         $nomBailleur = 'Bailleur';
                                     }
 
-                                    // Si la chaîne est vide
                                     if (empty(trim($nomBailleur))) {
                                         $nomBailleur = 'Bailleur';
                                     }
@@ -86,10 +85,15 @@
                                         {{ $contrat && $contrat->date_signature ? \Carbon\Carbon::parse($contrat->date_signature)->format('d/m/Y') : '-' }}
                                     </td>
                                     <td class="text-end pe-4">
+                                        {{-- BOUTON : Accès au plan d'échéances --}}
+                                        <a href="{{ route('entrepreneur.echeances', ['financement_id' => $financement->id]) }}" class="btn btn-sm btn-outline-primary rounded-3 me-1" title="Voir le plan de remboursement">
+                                            <i class="fas fa-calendar-alt me-1"></i> Échéances
+                                        </a>
+
                                         @if($contrat && !empty($contrat->fichier_url))
                                             {{-- Bouton pour lire le PDF --}}
                                             <a href="{{ asset('storage/' . $contrat->fichier_url) }}" target="_blank" class="btn btn-sm btn-outline-secondary rounded-3 me-1">
-                                                <i class="fas fa-eye me-1"></i> Lire le contrat
+                                                <i class="fas fa-eye me-1"></i> Lire
                                             </a>
 
                                             {{-- Bouton de signature (si non signé) --}}
@@ -107,7 +111,7 @@
                                                 </a>
                                             @endif
                                         @else
-                                            <span class="text-muted small">Aucun document rattaché</span>
+                                            <span class="text-muted small ms-1">Aucun document</span>
                                         @endif
                                     </td>
                                 </tr>

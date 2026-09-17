@@ -21,7 +21,12 @@ class Financement extends Model
 
     public function contrat()
 {
-    return $this->hasOne(Contrat::class, 'financement_id');
+    return $this->hasOne(Contrat::class, 'financements_id');
+}
+
+public function echeances()
+{
+    return $this->hasMany(Echeance::class, 'financements_id')->orderBy('date_prevu', 'asc');
 }
 
     

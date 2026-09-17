@@ -8,6 +8,7 @@ use App\Models\Projet;
 use App\Models\Offre_financement;
 use App\Models\Financement;
 use App\Models\Contrat;
+use App\Models\Echeancee;
 use Illuminate\Support\Facades\Auth;
 
 class EntrepreneurController extends Controller
@@ -85,10 +86,20 @@ public function offresFinancement()
     return view('entrepreneur.offres_financement', compact('offres'));
 }
 
-public function echeances()
+public function echeances(Request $request)
 {
-    // Cette action demande à Laravel de charger la page "echeances.blade.php"
-    return view('entrepreneur.echeances');
+    $financementId = $request->get('financement_id');
+
+    $financement = Financement::where('id_utilisateur', auth()->id())
+        ->when($financementId, fn($q) => $q->where('id', $financementId))
+        ->firstOrFail();
+
+    $echeances = $financement->echeances()->orderBy('date_echeance', 'asc')->get();
+
+    $totalPaye = $echeances->where('statut', 'paye')->sum('montant');
+    $resteAPayer = $financement->montant - $totalPaye;
+
+    return view('entrepreneur.echeances', compact('financement', 'echeances', 'totalPaye', 'resteAPayer'));
 }
 
 public function contrats()

@@ -7,6 +7,7 @@ use App\Http\Controllers\ProjetController;
 use App\Http\Controllers\EntrepreneurController;
 use App\Http\Controllers\BailleurController;
 use App\Http\Controllers\OffreController;
+use App\Http\Controllers\NotificationController;
 
 // --- PAGE D'ACCUEIL / LANDING PAGE ---
 Route::get('/', [AuthController::class, 'verification'])->name('login');
@@ -54,6 +55,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/entrepreneur/contrats', [EntrepreneurController::class, 'contrats'])->name('entrepreneur.contrats');
         Route::post('/contrats/{id}/signer', [EntrepreneurController::class, 'signerContrat'])
         ->name('entrepreneur.contrats.signer');
+        Route::get('/notifications/{id}/lire', [NotificationController::class, 'lireEtRediriger'])->name('notifications.lire');
         
     });
 

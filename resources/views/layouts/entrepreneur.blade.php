@@ -63,7 +63,6 @@
         </a>
       </li>
 
-      <!-- Bouton Offres de financement -->
       <li class="nav-item">
         <a href="{{ route('entrepreneur.offres_financement') }}" 
            class="nav-link {{ request()->routeIs('entrepreneur.offres_financement') ? 'active' : '' }}">
@@ -79,7 +78,7 @@
       </li>
 
       <li class="nav-item">
-        <a class="nav-link" href="{{ route('entrepreneur.contrats') }}">
+        <a class="nav-link {{ Route::is('entrepreneur.contrats') ? 'active' : '' }}" href="{{ route('entrepreneur.contrats') }}">
           <i class="fas fa-file-contract"></i> Contrats & garanties
         </a>
       </li>
@@ -106,44 +105,60 @@
         </span>
       </div>
 
-      <!-- BOUTON DE NOTIFICATION DYNAMIQUE -->
+      <!-- BOUTON DE NOTIFICATION DYNAMIQUE AVEC HISTORIQUE -->
       @php
-        $notificationsNonLues = \App\Models\Notification::where('id_utilisateur', Auth::id())
-            ->where('lue', false)
+        // Récupérer toutes les notifications
+        $toutesNotifications = \App\Models\Notification::where('id_utilisateur', Auth::id())
             ->latest()
+            ->take(10) // Limiter aux 10 plus récentes
             ->get();
+
+        // Compter uniquement les non lues pour le badge rouge
+        $nbNonLues = $toutesNotifications->where('lue', false)->count();
       @endphp
 
       <div class="dropdown">
         <button type="button" class="btn btn-light position-relative rounded-circle p-2 border-0 shadow-sm" id="dropdownMenuNotif" data-bs-toggle="dropdown" aria-expanded="false" style="width: 42px; height: 42px;">
           <i class="fas fa-bell text-secondary fs-5"></i>
-          @if($notificationsNonLues->count() > 0)
+          @if($nbNonLues > 0)
             <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.7rem;">
-              {{ $notificationsNonLues->count() }}
+              {{ $nbNonLues }}
             </span>
           @endif
         </button>
 
-        <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-4 p-2 mt-2" aria-labelledby="dropdownMenuNotif" style="width: 320px; max-height: 400px; overflow-y: auto;">
+        <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-4 p-2 mt-2" aria-labelledby="dropdownMenuNotif" style="width: 340px; max-height: 400px; overflow-y: auto;">
           <li class="dropdown-header fw-bold text-dark border-bottom pb-2 mb-2 d-flex justify-content-between align-items-center">
             <span>Notifications</span>
-            @if($notificationsNonLues->count() > 0)
-              <span class="badge bg-success rounded-pill">{{ $notificationsNonLues->count() }} nouvelle(s)</span>
+            @if($nbNonLues > 0)
+              <span class="badge bg-success rounded-pill">{{ $nbNonLues }} non lue(s)</span>
             @endif
           </li>
 
-          @forelse($notificationsNonLues as $notif)
+          @forelse($toutesNotifications as $notif)
             <li>
-              <a class="dropdown-item p-2 rounded-3 mb-1 bg-light text-wrap" href="{{ $notif->lien ?? route('entrepreneur.contrats') }}">
-                <strong class="d-block text-dark small">{{ $notif->titre }}</strong>
-                <span class="text-muted small d-block mb-1">{{ $notif->message }}</span>
-                <small class="text-success" style="font-size: 0.72rem;">{{ $notif->created_at ? $notif->created_at->diffForHumans() : '' }}</small>
+              {{-- Arrière-plan différent selon si la notification est lue ou non --}}
+              <a class="dropdown-item p-2 rounded-3 mb-1 text-wrap {{ !$notif->lue ? 'bg-light-success border-start border-3 border-success' : 'text-muted' }}" 
+                 href="{{ route('notifications.lire', $notif->id) }}"
+                 style="{{ !$notif->lue ? 'background-color: #f0fdf4;' : 'opacity: 0.8;' }}">
+                
+                <div class="d-flex justify-content-between align-items-start">
+                  <strong class="d-block text-dark small">{{ $notif->titre }}</strong>
+                  @if(!$notif->lue)
+                    <span class="badge bg-danger rounded-circle p-1 ms-1" title="Non lue" style="width: 8px; height: 8px;"></span>
+                  @endif
+                </div>
+
+                <span class="text-secondary small d-block mb-1">{{ $notif->contenu ?? $notif->message }}</span>
+                <small class="text-muted" style="font-size: 0.72rem;">
+                  <i class="far fa-clock me-1"></i>{{ $notif->created_at ? $notif->created_at->diffForHumans() : '' }}
+                </small>
               </a>
             </li>
           @empty
             <li class="text-center py-3 text-muted small">
               <i class="fas fa-bell-slash d-block mb-1 fs-5 text-secondary"></i>
-              Aucune nouvelle notification
+              Aucune notification
             </li>
           @endforelse
         </ul>
