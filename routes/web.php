@@ -56,6 +56,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/contrats/{id}/signer', [EntrepreneurController::class, 'signerContrat'])
         ->name('entrepreneur.contrats.signer');
         Route::get('/notifications/{id}/lire', [NotificationController::class, 'lireEtRediriger'])->name('notifications.lire');
+        Route::post('/entrepreneur/echeances/{id}/payer', [EntrepreneurController::class, 'payerEcheance'])->name('entrepreneur.echeances.payer');
         
     });
 

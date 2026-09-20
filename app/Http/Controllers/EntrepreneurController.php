@@ -8,7 +8,7 @@ use App\Models\Projet;
 use App\Models\Offre_financement;
 use App\Models\Financement;
 use App\Models\Contrat;
-use App\Models\Echeancee;
+use App\Models\Echeance;
 use Illuminate\Support\Facades\Auth;
 
 class EntrepreneurController extends Controller
@@ -88,18 +88,24 @@ public function offresFinancement()
 
 public function echeances(Request $request)
 {
+    $utilisateurId = auth()->id();
     $financementId = $request->get('financement_id');
 
-    $financement = Financement::where('id_utilisateur', auth()->id())
-        ->when($financementId, fn($q) => $q->where('id', $financementId))
-        ->firstOrFail();
+    // Récupère le financement spécifié OU le premier financement de l'entrepreneur
+    $financement = Financement::where('id_utilisateur', $utilisateurId)
+        ->when($financementId, function ($query) use ($financementId) {
+            return $query->where('id', $financementId);
+        })
+        ->latest()
+        ->first();
 
-    $echeances = $financement->echeances()->orderBy('date_echeance', 'asc')->get();
+    // S'il existe un financement, on récupère ses échéances
+    $echeances = collect();
+    if ($financement) {
+        $echeances = $financement->echeances; // Utilise la relation hasMany définie dans Financement
+    }
 
-    $totalPaye = $echeances->where('statut', 'paye')->sum('montant');
-    $resteAPayer = $financement->montant - $totalPaye;
-
-    return view('entrepreneur.echeances', compact('financement', 'echeances', 'totalPaye', 'resteAPayer'));
+    return view('entrepreneur.echeances', compact('financement', 'echeances'));
 }
 
 public function contrats()
@@ -127,5 +133,19 @@ public function signerContrat($id)
     ]);
 
     return redirect()->back()->with('success', 'Félicitations ! Le contrat a été validé et signé avec succès.');
+}
+
+public function payerEcheance($id)
+{
+    // Récupérer l'échéance
+    $echeance = Echeance::findOrFail($id);
+
+    // Mettre à jour le statut
+    $echeance->update([
+        'statut' => 'paye',
+        'date_prevu' => now(), // Assurez-vous d'avoir cette colonne ou retirez-la si non utilisée
+    ]);
+
+    return redirect()->back()->with('success', 'Le paiement de la mensualité a été effectué avec succès !');
 }
 }

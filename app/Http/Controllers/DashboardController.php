@@ -195,4 +195,42 @@ public function uploadContrat(Request $request, $financementId)
 
     return redirect()->back()->with('success', 'Contrat transmis avec succès à l’entrepreneur !');
 }
+
+// Exemple dans la méthode signerContrat($id)
+public function signerContrat($id)
+{
+    $contrat = Contrat::findOrFail($id);
+    $contrat->update(['statut' => 'signe', 'date_signature' => now()]);
+
+    $financement = $contrat->financement;
+
+    // 1. Vérifier si les échéances existent déjà pour éviter les doublons
+    if ($financement && $financement->echeances()->count() === 0) {
+        
+        $capital = $financement->montant_accorde;
+        $duree = max($financement->duree, 1); // Nombre de mois
+        $taux = $financement->taux_interet / 100;
+
+        // Calcul des montants
+        $totalInteret = $capital * $taux;
+        $mensualiteTotal = ($capital + $totalInteret) / $duree;
+        $capitalParMois = $capital / $duree;
+        $interetParMois = $totalInteret / $duree;
+
+        // 2. Générer chaque ligne du calendrier
+        for ($i = 1; $i <= $duree; $i++) {
+            \App\Models\Echeance::create([
+                'financements_id' => $financement->id,
+                'numero_echeance' => $i,
+                'date_prevu'       => now()->addMonths($i)->setDay(5), // Échéance le 5 de chaque mois
+                'montant_prevu'   => $mensualiteTotal,
+                'montant_capital' => $capitalParMois,
+                'montant_interet' => $interetParMois,
+                'statut'          => 'en_attente',
+            ]);
+        }
+    }
+
+    return redirect()->back()->with('success', 'Contrat signé avec succès. Le calendrier de remboursement a été généré !');
+}
 }

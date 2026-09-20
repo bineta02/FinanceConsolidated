@@ -9,10 +9,22 @@
         </div>
     </div>
 
+    {{-- ALERTES DE SUCCÈS OU D'ERREUR --}}
+    @if(session('success'))
+        <div class="alert alert-success border-0 rounded-3 mb-4">
+            <i class="fas fa-check-circle me-1"></i> {{ session('success') }}
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div class="alert alert-danger border-0 rounded-3 mb-4">
+            <i class="fas fa-exclamation-triangle me-1"></i> {{ session('error') }}
+        </div>
+    @endif
+
     @php
-        // Récupération des statistiques
-        $totalRembourse = isset($echeances) ? $echeances->where('statut', 'paye')->sum('montant') : 0;
-        $prochaineEcheance = isset($echeances) ? $echeances->where('statut', '!=', 'paye')->first() : null;
+        $totalRembourse = isset($echeances) ? $echeances->whereIn('statut', ['paye', 'payé', 'regle'])->sum('montant_prevu') : 0;
+        $prochaineEcheance = isset($echeances) ? $echeances->whereNotIn('statut', ['paye', 'payé', 'regle'])->first() : null;
         $resteAPayer = isset($financement) ? ($financement->montant_accorde - $totalRembourse) : 0;
     @endphp
 
@@ -27,10 +39,10 @@
                     <div>
                         <h6 class="text-muted text-uppercase small mb-1 fw-bold">Prochaine échéance</h6>
                         <h4 class="fw-bold text-dark mb-0">
-                            {{ $prochaineEcheance ? \Carbon\Carbon::parse($prochaineEcheance->date_echeance)->format('d/m/Y') : '-- / -- / ----' }}
+                            {{ $prochaineEcheance ? \Carbon\Carbon::parse($prochaineEcheance->date_prevu)->format('d/m/Y') : '-- / -- / ----' }}
                         </h4>
                         @if($prochaineEcheance)
-                            <small class="text-danger fw-semibold">{{ number_format($prochaineEcheance->montant, 0, ',', ' ') }} FCFA</small>
+                            <small class="text-danger fw-semibold">{{ number_format($prochaineEcheance->montant_prevu, 0, ',', ' ') }} FCFA</small>
                         @endif
                     </div>
                 </div>
@@ -77,23 +89,27 @@
                     <table class="table table-hover align-middle mb-0">
                         <thead class="bg-light">
                             <tr>
-                                <th class="ps-4">#</th>
-                                <th>Date d'échéance</th>
-                                <th>Montant à payer</th>
+                                <th class="ps-4">N°</th>
+                                <th>Date prévue</th>
+                                <th>Capital</th>
+                                <th>Intérêts</th>
+                                <th>Montant total</th>
                                 <th>Statut</th>
                                 <th class="text-end pe-4">Action</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($echeances as $index => $echeance)
+                            @foreach($echeances as $echeance)
                                 <tr>
-                                    <td class="ps-4 fw-bold text-muted">{{ $index + 1 }}</td>
+                                    <td class="ps-4 fw-bold text-muted">{{ $echeance->numero_echeance }}</td>
                                     <td>
                                         <i class="far fa-calendar me-2 text-secondary"></i>
-                                        {{ \Carbon\Carbon::parse($echeance->date_echeance)->format('d/m/Y') }}
+                                        {{ \Carbon\Carbon::parse($echeance->date_prevu)->format('d/m/Y') }}
                                     </td>
+                                    <td>{{ number_format($echeance->montant_capital, 0, ',', ' ') }} FCFA</td>
+                                    <td>{{ number_format($echeance->montant_interet, 0, ',', ' ') }} FCFA</td>
                                     <td>
-                                        <span class="fw-bold text-dark">{{ number_format($echeance->montant, 0, ',', ' ') }} FCFA</span>
+                                        <span class="fw-bold text-dark">{{ number_format($echeance->montant_prevu, 0, ',', ' ') }} FCFA</span>
                                     </td>
                                     <td>
                                         @if(in_array(strtolower($echeance->statut), ['paye', 'payé', 'regle']))
@@ -112,9 +128,12 @@
                                     </td>
                                     <td class="text-end pe-4">
                                         @if(!in_array(strtolower($echeance->statut), ['paye', 'payé', 'regle']))
-                                            <button class="btn btn-sm btn-primary rounded-3">
-                                                <i class="fas fa-credit-card me-1"></i> Payer
-                                            </button>
+                                            <form action="{{ route('entrepreneur.echeances.payer', $echeance->id) }}" method="POST" class="d-inline">
+                                                @csrf
+                                                <button type="submit" class="btn btn-sm btn-primary rounded-3" onclick="return confirm('Confirmez-vous le paiement de cette mensualité ?')">
+                                                    <i class="fas fa-credit-card me-1"></i> Payer
+                                                </button>
+                                            </form>
                                         @else
                                             <span class="text-muted small"><i class="fas fa-check text-success me-1"></i> Réglé</span>
                                         @endif

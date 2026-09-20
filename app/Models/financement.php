@@ -19,7 +19,14 @@ class Financement extends Model
         return $this->belongsTo(Bailleur::class, 'id_bailleur');
     }
 
-    public function contrat()
+
+public function garanties()
+{
+    // On spécifie la clé étrangère 'financement_id'
+    return $this->hasMany(Garantie::class, 'financements_id');
+}
+
+public function contrat()
 {
     return $this->hasOne(Contrat::class, 'financements_id');
 }

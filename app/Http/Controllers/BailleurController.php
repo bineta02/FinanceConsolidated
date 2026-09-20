@@ -36,10 +36,21 @@ class BailleurController extends Controller
      * Suivi des échéances et remboursements
      */
     public function echeances()
-    {
-        return view('bailleur.echeances');
-    }
+{
+    $user = auth()->user();
+    $bailleurId = $user->bailleur->id ?? null;
 
+    // Récupère TOUS les financements rattachés au bailleur
+    $financements = Financement::where('bailleur_id', $bailleurId)
+        ->orWhereHas('offreFinancement', function ($query) use ($bailleurId) {
+            $query->where('bailleur_id', $bailleurId);
+        })
+        ->with(['projet.entrepreneur', 'echeances'])
+        ->latest()
+        ->get();
+
+    return view('bailleur.echeances', compact('financements'));
+}
     /**
      * Affichage du formulaire des critères de financement (GET)
      */
@@ -88,4 +99,21 @@ public function updateCriteres(Request $request)
     {
         return view('bailleur.contrats');
     }
+
+    public function garanties()
+{
+    $user = auth()->user();
+    $bailleurId = $user->bailleur->id ?? null;
+
+    // Récupérer les financements du bailleur avec leurs garanties et projets
+    $financements = Financement::where('bailleur_id', $bailleurId)
+        ->orWhereHas('offreFinancement', function ($query) use ($bailleurId) {
+            $query->where('bailleur_id', $bailleurId);
+        })
+        ->with(['projet.entrepreneur', 'garanties'])
+        ->latest()
+        ->get();
+
+    return view('bailleur.garanties', compact('financements'));
+}
 }
