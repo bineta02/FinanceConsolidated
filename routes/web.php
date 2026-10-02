@@ -46,6 +46,7 @@ Route::middleware(['auth'])->group(function () {
                 
         // --- ONGLETS COMPLEMENTAIRES ---
         // Route ajoutée pour les offres de financement :
+        Route::get('/dashboard', [EntrepreneurController::class, 'dashboard'])->name('dashboard');
         Route::get('/entrepreneur/offres-financement', [EntrepreneurController::class, 'financements'])->name('entrepreneur.financements.index');
         Route::get('/offres-financement', [OffreController::class, 'indexEntrepreneur'])->name('bailleur.offres.index');
         Route::get('/entrepreneur/financements', [EntrepreneurController::class, 'financements'])->name('entrepreneur.financements');
@@ -86,7 +87,9 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/bailleur/contrats', [DashboardController::class, 'contrats'])->name('bailleur.contrats');
         Route::post('/bailleur/contrats/{financementId}/upload', [DashboardController::class, 'uploadContrat'])
         ->name('bailleur.contrats.upload');
+        Route::post('/bailleur/update-capacite', [DashboardController::class, 'updateCapacite'])->name('bailleur.update_capacite');
         
            });
+
             
 });

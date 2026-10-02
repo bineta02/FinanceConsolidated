@@ -36,6 +36,18 @@
                                     $nomEntrepreneur = $entrepreneur 
                                         ? trim(($entrepreneur->prenom ?? '') . ' ' . ($entrepreneur->nom ?? '')) 
                                         : 'Entrepreneur';
+
+                                    // Récupération souple de la date de signature
+                                    $dateSignature = $contrat ? ($contrat->date_signature ?? $contrat->date_signature_entrepreneur ?? $contrat->updated_at) : null;
+
+                                    // Détection robuste du statut "Signé"
+                                    $statutClean = $contrat ? strtolower(trim($contrat->statut ?? '')) : '';
+                                    $estSigne = $contrat && (
+                                        in_array($statutClean, ['signe', 'signé', 'valide', 'validé', 'actif', 'signe_entrepreneur', 'signe_bailleur']) ||
+                                        !empty($contrat->date_signature) ||
+                                        !empty($contrat->date_signature_entrepreneur) ||
+                                        !empty($contrat->signature_entrepreneur)
+                                    );
                                 @endphp
                                 <tr>
                                     <td class="ps-4">
@@ -49,7 +61,14 @@
                                     
                                     {{-- Date de signature --}}
                                     <td>
-                                        {{ $contrat && $contrat->date_signature ? \Carbon\Carbon::parse($contrat->date_signature)->format('d/m/Y') : '-' }}
+                                        @if($estSigne && $dateSignature)
+                                            <span class="fw-semibold text-dark">
+                                                <i class="far fa-calendar-check me-1 text-success"></i>
+                                                {{ \Carbon\Carbon::parse($dateSignature)->format('d/m/Y') }}
+                                            </span>
+                                        @else
+                                            <span class="text-muted small">-- / -- / ----</span>
+                                        @endif
                                     </td>
 
                                     {{-- Statut dynamique du contrat --}}
@@ -58,17 +77,17 @@
                                             <span class="badge bg-warning text-dark rounded-pill px-3">
                                                 <i class="fas fa-exclamation-triangle me-1"></i> En attente de contrat
                                             </span>
-                                        @elseif(in_array(strtolower($contrat->statut), ['signe', 'signé', 'valide', 'actif']))
+                                        @elseif($estSigne)
                                             <span class="badge bg-success rounded-pill px-3">
                                                 <i class="fas fa-check-circle me-1"></i> Signé
                                             </span>
-                                        @elseif(in_array(strtolower($contrat->statut), ['a_signer', 'en_attente', 'en attente de signature', 'à signé']))
+                                        @elseif(in_array($statutClean, ['a_signer', 'en_attente', 'en attente de signature', 'à signer', 'transmis']))
                                             <span class="badge bg-info text-dark rounded-pill px-3">
                                                 <i class="fas fa-clock me-1"></i> En attente de signature
                                             </span>
                                         @else
                                             <span class="badge bg-secondary rounded-pill px-3">
-                                                {{ $contrat->statut }}
+                                                {{ ucfirst($contrat->statut) }}
                                             </span>
                                         @endif
                                     </td>
@@ -90,34 +109,6 @@
                                         <button type="button" class="btn btn-sm btn-primary rounded-3" data-bs-toggle="modal" data-bs-target="#modalContrat{{ $financement->id }}">
                                             <i class="fas fa-upload me-1"></i> {{ $contrat ? 'Remplacer' : 'Ajouter' }}
                                         </button>
-
-                                        <!-- Modal Upload pour chaque financement -->
-                                        <div class="modal fade text-start" id="modalContrat{{ $financement->id }}" tabindex="-1" aria-hidden="true">
-                                            <div class="modal-dialog modal-dialog-centered">
-                                                <div class="modal-content rounded-4 border-0">
-                                                    <form action="{{ route('bailleur.contrats.upload', $financement->id) }}" method="POST" enctype="multipart/form-data">
-                                                        @csrf
-                                                        <div class="modal-header border-0 pb-0">
-                                                            <h5 class="modal-title fw-bold">Transmission du Contrat</h5>
-                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                        </div>
-                                                        <div class="modal-body">
-                                                            <p class="text-muted small mb-3">Projet : <strong>{{ $financement->projet->titre ?? 'Projet' }}</strong></p>
-
-                                                            <div class="mb-3">
-                                                                <label class="form-label fw-semibold">Fichier du contrat (PDF/DOC)</label>
-                                                                <input type="file" name="fichier_contrat" class="form-control" accept=".pdf,.doc,.docx" required>
-                                                                <div class="form-text">Le document sera transmis à l'entrepreneur pour examen et signature.</div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="modal-footer border-0 pt-0">
-                                                            <button type="button" class="btn btn-light rounded-3" data-bs-dismiss="modal">Annuler</button>
-                                                            <button type="submit" class="btn btn-success rounded-3">Transmettre le contrat</button>
-                                                        </div>
-                                                    </form>
-                                                </div>
-                                            </div>
-                                        </div>
                                     </td>
                                 </tr>
                             @endforeach
@@ -133,4 +124,39 @@
         </div>
     </div>
 </div>
+
+<!-- MODALS DE TRANSMISSION / REMPLACEMENT DU CONTRAT -->
+@if(isset($financements) && $financements->count() > 0)
+    @foreach($financements as $financement)
+        @php
+            $contrat = $financement->contrat;
+        @endphp
+        <div class="modal fade text-start" id="modalContrat{{ $financement->id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content rounded-4 border-0 shadow-lg">
+                    <form action="{{ route('bailleur.contrats.upload', $financement->id) }}" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        <div class="modal-header border-0 pb-0">
+                            <h5 class="modal-title fw-bold">Transmission du Contrat</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p class="text-muted small mb-3">Projet : <strong>{{ $financement->projet->titre ?? 'Projet' }}</strong></p>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Fichier du contrat (PDF/DOC)</label>
+                                <input type="file" name="fichier_contrat" class="form-control" accept=".pdf,.doc,.docx" required>
+                                <div class="form-text">Le document sera transmis à l'entrepreneur pour examen et signature.</div>
+                            </div>
+                        </div>
+                        <div class="modal-footer border-0 pt-0">
+                            <button type="button" class="btn btn-light rounded-3" data-bs-dismiss="modal">Annuler</button>
+                            <button type="submit" class="btn btn-success rounded-3">Transmettre le contrat</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    @endforeach
+@endif
 @endsection

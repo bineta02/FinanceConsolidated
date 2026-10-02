@@ -13,6 +13,58 @@ use Illuminate\Support\Facades\Auth;
 
 class EntrepreneurController extends Controller
 {
+
+
+public function dashboard()
+{
+    $userId = Auth::id();
+
+    // 1. Récupérer le profil de l'entrepreneur
+    $entrepreneur = Entrepreneur::where('id_utilisateur', $userId)->first();
+
+    // 2. Récupérer les IDs de tous les financements reçus par cet entrepreneur
+    $financementIds = Financement::where('id_utilisateur', $userId)
+        ->orWhereHas('projet', function ($q) use ($userId) {
+            $q->where('id_utilisateur', $userId);
+        })
+        ->pluck('id');
+
+    // 3. Calculer les Fonds collectés
+    $fondsCollectes = Projet::where('id_utilisateur', $userId)->sum('montant_collecte');
+    if ($fondsCollectes == 0) {
+        $fondsCollectes = Financement::whereIn('id', $financementIds)->sum('montant_accorde');
+    }
+
+    // 4. CALCUL DYNAMIQUE DU RESTE À REMBOURSER
+    
+    // Total global dû selon la table des échéances
+    $totalDu = Echeance::whereIn('financements_id', $financementIds)->sum('montant');
+
+    // Total déjà payé (échéances marquées comme paye ou payé)
+    $totalPaye = Echeance::whereIn('financements_id', $financementIds)
+        ->whereIn('statut', ['paye', 'payé', 'valide', 'validé'])
+        ->sum('montant');
+
+    // Si des échéances existent, on calcule (Total dû - Déjà payé)
+    // Sinon, on retombe sur (Fonds collectés - Déjà payé)
+    if ($totalDu > 0) {
+        $resteARembourser = max(0, $totalDu - $totalPaye);
+    } else {
+        $resteARembourser = max(0, $fondsCollectes - $totalPaye);
+    }
+
+    // 5. Récupérer les projets de l'entrepreneur pour les graphiques/listes
+    $projets = Projet::where('id_utilisateur', $userId)->get();
+
+    return view('entrepreneur.dashboard', compact(
+        'entrepreneur',
+        'fondsCollectes',
+        'resteARembourser',
+        'totalPaye',
+        'projets'
+    ));
+}
+
     /**
      * Montre le formulaire de modification (recherche dans views/entrepreneur/edit.blade.php)
      */
