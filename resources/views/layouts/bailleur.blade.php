@@ -26,6 +26,8 @@
     .card-modern { border: none; border-radius: 24px; background: white; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
     .btn-green { background: var(--primary-green); border: none; color: white; border-radius: 40px; padding: 0.5rem 1.5rem; font-weight: 500; text-decoration: none; }
     .btn-green:hover { background: var(--dark-green); color: white; }
+    .fs-7 { font-size: 0.85rem; }
+    .fs-8 { font-size: 0.75rem; }
   </style>
 </head>
 <body>
@@ -49,76 +51,114 @@
       </li>
       
       <!-- 2. Explorer & Investir -->
-      <a href="{{ route('bailleur.explorer') }}" class="nav-link">
-    <i class="fas fa-search me-2"></i> Explorer & Investir
-</a>
+      <li class="nav-item">
+        <a href="{{ route('bailleur.explorer') }}" class="nav-link {{ Route::is('bailleur.explorer') ? 'active' : '' }}">
+          <i class="fas fa-search"></i> Explorer & Investir
+        </a>
+      </li>
 
       <!-- 3. Mes investissements -->
-      <a href="{{ route('bailleur.investissements') }}" class="nav-link">
-    <i class="fas fa-chart-line me-2"></i> Mes investissements
-</a>
+      <li class="nav-item">
+        <a href="{{ route('bailleur.investissements') }}" class="nav-link {{ Route::is('bailleur.investissements') ? 'active' : '' }}">
+          <i class="fas fa-chart-line"></i> Mes investissements
+        </a>
+      </li>
 
       
 
       <!-- 5. Mes critères de financement -->
       <li class="nav-item">
-  <a class="nav-link {{ Route::is('bailleur.criteres') ? 'active' : '' }}" href="{{ route('bailleur.criteres') }}">
-    <i class="fas fa-sliders-h"></i> Mes critères de financement
-  </a>
-</li>
+        <a class="nav-link {{ Route::is('bailleur.criteres*') ? 'active' : '' }}" href="{{ route('bailleur.criteres') }}">
+          <i class="fas fa-sliders-h"></i> Mes critères de financement
+        </a>
+      </li>
 
+      <!-- 6. Mes Offres de financement -->
+      <li class="nav-item">
+        <a class="nav-link {{ Route::is('bailleur.offres.*') ? 'active' : '' }}" href="{{ route('bailleur.offres.index') }}">
+          <i class="fas fa-hand-holding-usd"></i> Mes Offres de financement
+        </a>
+      </li>
 
-<li class="nav-item">
-  <a class="nav-link {{ Route::is('bailleur.offres.*') ? 'active' : '' }}" href="{{ route('bailleur.offres.index') }}">
-    <i class="fas fa-hand-holding-usd"></i> Mes Offres de financement
-  </a>
-</li>
+      <!-- 7. Échéances & Remboursements -->
+      <li class="nav-item">
+        <a href="{{ route('bailleur.echeances') }}" class="nav-link {{ Route::is('bailleur.echeances') ? 'active' : '' }}">
+          <i class="fas fa-calendar-alt"></i> Échéances & Remboursements
+        </a>
+      </li>
 
-<!-- 4. Échéances & Remboursements -->
-      <a href="{{ route('bailleur.echeances') }}" class="nav-link">
-    <i class="fas fa-calendar-alt me-2"></i> Échéances & Remboursements
-</a>
-
-      <!-- 6. Garanties & contrats -->
-      <a href="{{ route('bailleur.contrats') }}" class="nav-link">
-    <i class="fas fa-file-contract me-2"></i> Garanties & contrats
-</a>
-
-      <div class="top-bar">
-  <div>
-    <span class="ms-2 fw-semibold">
-      Bonjour, <span class="text-success">{{ Auth::user()->prenom }} {{ Auth::user()->nom }}</span>
-    </span>
-  </div>
-  <div class="d-flex align-items-center gap-3">
-    <!-- Bouton d'accès rapide au profil / critères -->
-    <a href="{{ route('bailleur.criteres.edit') }}" class="btn btn-sm btn-outline-success rounded-4">
-      <i class="fas fa-user-cog me-1"></i> Mon Profil & Critères
-    </a>
-    <i class="fas fa-bell text-muted"></i>
-  </div>
-</div>
+      <!-- 8. Garanties & contrats -->
+      <li class="nav-item">
+        <a href="{{ route('bailleur.contrats') }}" class="nav-link {{ Route::is('bailleur.contrats') ? 'active' : '' }}">
+          <i class="fas fa-file-contract"></i> Garanties & contrats
+        </a>
+      </li>
 
       <!-- Déconnexion -->
       <li class="nav-item mt-4">
-        <a class="nav-link text-danger" href="{{ route('logout') }}">
+        <a class="nav-link text-danger" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
           <i class="fas fa-sign-out-alt"></i> Déconnexion
         </a>
+        <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+            @csrf
+        </form>
       </li>
     </ul>
   </aside>
 
   <main class="main-content">
+    <!-- BARRE SUPÉRIEURE DYNAMIQUE -->
     <div class="top-bar">
       <div>
         <span class="ms-2 fw-semibold">
           Bonjour, <span class="text-success">{{ Auth::user()->prenom }} {{ Auth::user()->nom }}</span>
         </span>
       </div>
-      <div><i class="fas fa-bell text-muted"></i></div>
+
+      <div class="d-flex align-items-center gap-3">
+        <!-- Bouton d'accès rapide -->
+        <a href="{{ route('bailleur.criteres.edit') }}" class="btn btn-sm btn-outline-success rounded-4">
+          <i class="fas fa-user-cog me-1"></i> Mon Profil & Critères
+        </a>
+
+        <!-- DROPDOWN CLOCHE NOTIFICATIONS DYNAMIQUE -->
+        <div class="dropdown">
+          <a class="nav-link position-relative text-secondary p-2" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="fas fa-bell fs-5"></i>
+            @if(auth()->user()->mesNotificationsNonLues->count() > 0)
+              <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-light" style="font-size: 0.60rem;">
+                {{ auth()->user()->mesNotificationsNonLues->count() }}
+              </span>
+            @endif
+          </a>
+
+          <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-4 p-2" style="width: 320px;">
+            <li class="px-2 py-1 border-bottom d-flex align-items-center justify-content-between mb-2">
+              <span class="fw-bold text-dark fs-7">Notifications</span>
+              <small class="text-muted fs-8">{{ auth()->user()->mesNotificationsNonLues->count() }} non lue(s)</small>
+            </li>
+
+            @forelse(auth()->user()->mesNotificationsNonLues->take(5) as $notif)
+              <li>
+                <a class="dropdown-item p-2 rounded mb-1 bg-light" href="{{ route('bailleur.messages.index') }}">
+                  <div class="fw-semibold text-dark fs-7 text-truncate">{{ $notif->titre ?? 'Notification' }}</div>
+                  <div class="text-muted text-truncate fs-8">{{ $notif->contenu ?? '' }}</div>
+                  <small class="text-muted d-block mt-1" style="font-size: 0.65rem;">
+                    {{ \Carbon\Carbon::parse($notif->created_at ?? $notif->date_creation)->diffForHumans() }}
+                  </small>
+                </a>
+              </li>
+            @empty
+              <li class="text-center py-3 text-muted fs-7">Aucune nouvelle notification</li>
+            @endforelse
+
+            
+          </ul>
+        </div>
+      </div>
     </div>
 
-    <!-- C'est ici que s'injectera le contenu spécifique des vues du bailleur -->
+    <!-- Contenu des vues enfants -->
     @yield('content')
 
     <footer class="text-center py-3 mt-4">

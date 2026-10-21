@@ -87,52 +87,52 @@ public function bailleurIndex()
     $user = Auth::user();
     
     // 1. Récupérer le profil du bailleur
-    $bailleur = Bailleur::where('id_utilisateur', $user->id)->first();$bailleurId = $bailleur ? $bailleur->id : null;
+    $bailleur = Bailleur::where('id_utilisateur', $user->id)->first();
+    $bailleurId = $bailleur ? $bailleur->id : null;
 
-    // 2. Récupérer les financements existants
-    $financementsBailleur = Financement::where(function($q) use ($bailleurId,$user) {
+    // 2. Récupérer les financements attribués par ce bailleur connecté
+    $financementsBailleur = Financement::where(function($q) use ($bailleurId, $user) {
             if ($bailleurId) {
-                $q->where('id_bailleur',$bailleurId);
+                $q->where('id_bailleur', $bailleurId);
             }
-            $q->orWhere('id_utilisateur',$user->id);
+            $q->orWhere('id_utilisateur', $user->id);
         })
         ->get();
 
-    $projetsFinancesIds =$financementsBailleur->pluck('projet_id')->unique()->filter()->toArray();
+    $projetsFinancesIds = $financementsBailleur->pluck('projet_id')->unique()->filter()->toArray();
 
-    // 3. Calculs des cartes KPIs
+    // 3. Calculs des cartes KPIs du bailleur
     $projetsFinancesCount = count($projetsFinancesIds);
-    $totalInvesti =$financementsBailleur->sum('montant_accorde');
+    $totalInvesti = $financementsBailleur->sum('montant_accorde');
     
-    $capaciteTotale =$bailleur->capacite_financement ?? 0;
-    $capitalDisponible = max(0, $capaciteTotale -$totalInvesti);
+    $capaciteTotale = $bailleur->capacite_financement ?? 0;
+    $capitalDisponible = max(0, $capaciteTotale - $totalInvesti);
 
-    $contratsActifs = Contrat::whereIn('financements_id',$financementsBailleur->pluck('id'))->count();
+    $contratsActifs = Contrat::whereIn('financements_id', $financementsBailleur->pluck('id'))->count();
 
-    // 4. Base de la requête : Projets non encore financés et avec statut valide
-    $queryProjets = Projet::whereNotIn('id',$projetsFinancesIds)
-        ->whereIn('statut', ['en_attente', 'approuve', 'soumis']);
+    // 4. Base de la requête : Tous les projets validés/en attente
+    // (On ne masque plus les projets qui ont déjà reçu des financements)
+    $queryProjets = Projet::whereIn('statut', ['en_attente', 'approuve', 'soumis']);
 
-    // 5. Filtrage sur le/les secteur(s) préféré(s) du bailleur
+    // 5. Filtrage strict par secteur(s) préféré(s) du bailleur
     if ($bailleur && !empty($bailleur->secteurs_preferes)) {
         
-        // Découpage si plusieurs secteurs (ex: "Agriculture, Élevage") ou format JSON
         $raw = is_array($bailleur->secteurs_preferes) 
             ? $bailleur->secteurs_preferes 
             : explode(',', trim((string)$bailleur->secteurs_preferes, '[]"\' '));
 
-        $secteurs = array_filter(array_map('trim',$raw));
+        $secteurs = array_filter(array_map('trim', $raw));
 
-        if (!empty($secteurs)) {$queryProjets->where(function($parentQuery) use ($secteurs) {
-                foreach ($secteurs as$secteur) {
-                    // Recherche insensible à la casse et souple dans la colonne `categorie`
-                    $parentQuery->orWhere('categorie', 'LIKE', '\%' .$secteur . '%');
+        if (!empty($secteurs)) {
+            $queryProjets->where(function($parentQuery) use ($secteurs) {
+                foreach ($secteurs as $secteur) {
+                    $parentQuery->orWhere('categorie', 'LIKE', '%' . $secteur . '%');
                 }
             });
         }
     }
 
-    $projetsDisponibles =$queryProjets->latest()->get();
+    $projetsDisponibles = $queryProjets->latest()->get();
 
     return view('bailleur.dashboard', compact(
         'projetsDisponibles', 

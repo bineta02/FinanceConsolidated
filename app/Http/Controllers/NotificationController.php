@@ -18,4 +18,6 @@ class NotificationController extends Controller
         // 2. Rediriger l'entrepreneur vers la page des contrats
         return redirect()->route('entrepreneur.contrats');
     }
+
+   
 }

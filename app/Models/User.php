@@ -31,4 +31,14 @@ class User extends Authenticatable
 {
     return $this->hasOne(Bailleur::class, 'id_utilisateur');
 }
+
+public function mesNotifications()
+{
+    return $this->hasMany(Notification::class, 'id_utilisateur')->orderBy('created_at', 'desc');
+}
+
+public function mesNotificationsNonLues()
+{
+    return $this->hasMany(Notification::class, 'id_utilisateur')->where('lue', false);
+}
 }
